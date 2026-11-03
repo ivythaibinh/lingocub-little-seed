@@ -4,7 +4,7 @@
   "use strict";
 
   // ▼▼▼ Dán link Ứng dụng web của Apps Script (kết thúc bằng /exec) vào giữa hai dấu ngoặc kép ▼▼▼
-  var API = "";
+  var API = "https://script.google.com/macros/s/AKfycbxnqnHIlzs4Zn_4ig0H7-mxu9sNGDTZh6udiFyM2TqONA5tyDwDEDwOu5p61N2cLn-g/exec";
   // ▲▲▲
 
   if (window.LC) return;
