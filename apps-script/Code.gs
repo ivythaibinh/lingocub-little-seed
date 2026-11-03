@@ -5,7 +5,7 @@
  *  1. Mở Google Sheet dùng để theo dõi → Tiện ích mở rộng → Apps Script.
  *  2. Xoá hết mã có sẵn, dán toàn bộ tệp này vào, bấm Lưu.
  *  3. Chọn hàm "caiDat" ở thanh trên cùng → Chạy → cho phép quyền truy cập.
- *     Hàm này tạo các trang tính "Sự kiện", "Học sinh", "Cài đặt", "Bảng điểm"
+ *     Hàm này tạo các trang tính "Sự kiện", "Học sinh", "Cài đặt", "Bảng điểm", "Nông trại"
  *     và một mật khẩu giáo viên ngẫu nhiên (xem ở trang "Cài đặt").
  *  4. Triển khai → Tùy chọn triển khai mới → Loại: Ứng dụng web
  *     · Thực thi với tư cách: Tôi   · Người có quyền truy cập: Bất kỳ ai
@@ -16,7 +16,9 @@
  * Phiên bản: Phiên bản mới → Triển khai (link /exec giữ nguyên).
  */
 
-var SH_EV = 'Sự kiện', SH_HS = 'Học sinh', SH_CD = 'Cài đặt', SH_BD = 'Bảng điểm';
+var SH_EV = 'Sự kiện', SH_HS = 'Học sinh', SH_CD = 'Cài đặt', SH_BD = 'Bảng điểm', SH_NT = 'Nông trại';
+var NT_HEAD = ['Mã bé', 'Tên bé', 'Cập nhật', 'Dữ liệu nông trại'];
+var TZ = 'Asia/Ho_Chi_Minh', CAP_DAY = 40, SAT_STARS = 5;
 var EV_HEAD = ['Thời gian', 'Mã bé', 'Tên bé', 'Unit', 'Mục', 'Loại', 'Trò', 'Điểm', 'Tổng', '%', 'Giây', 'Ghi chú', 'Phiên'];
 var HS_HEAD = ['Mã bé', 'Tên bé', 'SĐT phụ huynh', 'Lớp', 'Ngày đăng ký', 'Lần học gần nhất', 'Ghi chú'];
 var TYPE = { open: 'Mở bài', time: 'Thời gian', score: 'Điểm', video: 'Video', audio: 'Ghi âm', game: 'Vào trò' };
@@ -44,6 +46,11 @@ function caiDat() {
     cd.getRange('B1').setNumberFormat('@');
     cd.setColumnWidth(1, 300); cd.setColumnWidth(2, 420);
   }
+  if (!cd.getRange('A4').getValue()) {
+    cd.getRange('A4:B4').setValues([['Sao mục tiêu mỗi bé / tuần (Cây Đại Thụ của lớp)', 40]]);
+    cd.getRange('A4').setFontWeight('bold');
+  }
+  sheet_(SH_NT, NT_HEAD).getRange('C:C').setNumberFormat('dd/MM/yyyy HH:mm');
   var bd = ss.getSheetByName(SH_BD);
   if (!bd) {
     bd = ss.insertSheet(SH_BD);
@@ -95,11 +102,12 @@ function sameKid_(a, b) {
 }
 function settings_() {
   var cd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SH_CD);
-  if (!cd) return { pass: '', classes: [] };
-  var v = cd.getRange('B1:B2').getDisplayValues();
+  if (!cd) return { pass: '', classes: [], goal: 40 };
+  var v = cd.getRange('B1:B4').getDisplayValues();
   return {
     pass: String(v[0][0]).trim(),
-    classes: String(v[1][0]).split(',').map(function (x) { return x.trim(); }).filter(String)
+    classes: String(v[1][0]).split(',').map(function (x) { return x.trim(); }).filter(String),
+    goal: Number(v[3][0]) > 0 ? Number(v[3][0]) : 40
   };
 }
 function checkKey_(key) {
@@ -129,6 +137,7 @@ function doGet(e) {
   try {
     if (p.action === 'progress') return json_({ ok: true, progress: progress_(p.id) });
     if (p.action === 'kid') return json_(kid_(p.id));
+    if (p.action === 'farm') return json_(farm_(p.id));
     if (p.action === 'data') { checkKey_(p.key); return json_(data_(p.days)); }
     return json_({ ok: true, app: 'lingocub-little-seed', time: new Date().toISOString() });
   } catch (err) {
@@ -145,6 +154,7 @@ function doPost(e) {
     if (b.action === 'login') return json_({ ok: true, student: login_(b.name, b.phone) });
     if (b.action === 'log') return json_({ ok: true, n: log_(b.events || []) });
     if (b.action === 'setClass') { checkKey_(b.key); return json_({ ok: true, student: setClass_(b.id, b.lop) }); }
+    if (b.action === 'farmSave') return json_(farmSave_(b.id, b.name, b.state));
     return json_({ ok: false, error: 'Không rõ yêu cầu' });
   } catch (err) {
     return json_({ ok: false, error: String(err.message || err) });
@@ -269,7 +279,8 @@ function data_(days) {
       last: k.last instanceof Date ? k.last.toISOString() : ''
     };
   });
-  return { ok: true, students: st, classes: settings_().classes, events: ev, cols: EV_HEAD.slice(0, 12), time: new Date().toISOString() };
+  var cfg = settings_();
+  return { ok: true, students: st, classes: cfg.classes, goal: cfg.goal, events: ev, cols: EV_HEAD.slice(0, 12), time: new Date().toISOString() };
 }
 
 /* Trang "Tiến độ của bé" cho phụ huynh: chỉ trả dữ liệu của đúng một bé (biết SĐT + tên bé) */
@@ -281,4 +292,101 @@ function kid_(id) {
   var k = null;
   students_().list.forEach(function (s) { if (s.id === id) k = s; });
   return { ok: true, name: k ? k.name : '', lop: k ? k.lop : '', events: ev, time: new Date().toISOString() };
+}
+
+/* ---------- Nông trại của bé ----------
+   Sao học: mỗi trò lấy điểm cao nhất trong ngày (1 câu đúng = 1 sao), tối đa 40 sao / ngày;
+   video Show and Tell (mục Show and Tell hoặc Practice) +5 sao, mỗi Unit 1 lần. */
+function day_(d) { return Utilities.formatDate(d, TZ, 'yyyy-MM-dd'); }
+function addDays_(s, n) { var d = new Date(s + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
+function monday_(s) { var w = new Date(s + 'T12:00:00Z').getUTCDay(); return addDays_(s, -((w + 6) % 7)); }
+
+/* dựng sổ sao của nhiều bé cùng lúc từ trang "Sự kiện" */
+function ledgers_(ids) {
+  var want = {}, back = {}, out = {};
+  ids.forEach(function (id) { want[id] = true; out[id] = { d: {}, sat: {} }; });
+  Object.keys(SEC).forEach(function (k) { back[SEC[k]] = k; });
+  events_().forEach(function (r) {
+    var id = String(r[1]);
+    if (!want[id] || !(r[0] instanceof Date)) return;
+    var L = out[id], dd = day_(r[0]), sec = back[r[4]] || String(r[4]), unit = String(r[3] || 0);
+    if (r[5] === TYPE.score) {
+      var k = unit + '|' + sec + '|' + String(r[6]).slice(0, 80), sc = Number(r[7]) || 0;
+      var t = L.d[dd] || (L.d[dd] = {});
+      if (!(t[k] >= sc)) t[k] = sc;
+    } else if (r[5] === TYPE.video && (sec === 'show-and-tell' || sec === 'practice') && Number(unit)) {
+      if (!L.sat[unit] || L.sat[unit] > dd) L.sat[unit] = dd;
+    }
+  });
+  return out;
+}
+function dayStars_(L) {
+  var out = {};
+  Object.keys(L.d).forEach(function (dd) {
+    var s = 0, t = L.d[dd];
+    Object.keys(t).forEach(function (k) { s += Number(t[k]) || 0; });
+    out[dd] = Math.min(CAP_DAY, s);
+  });
+  Object.keys(L.sat).forEach(function (u) { var dd = L.sat[u]; out[dd] = (out[dd] || 0) + SAT_STARS; });
+  return out;
+}
+
+function farm_(id) {
+  id = String(id || '');
+  if (!id) return { ok: false, error: 'Thiếu mã bé' };
+  var st = students_().list, me = null;
+  st.forEach(function (k) { if (k.id === id) me = k; });
+  var lop = me ? String(me.lop || '').trim() : '';
+  var members = lop ? st.filter(function (k) { return String(k.lop || '').trim() === lop; }).map(function (k) { return k.id; }) : [];
+  if (members.indexOf(id) < 0) members.push(id);
+  var Ls = ledgers_(members);
+  var res = { ok: true, ledger: Ls[id], state: farmGet_(id), time: new Date().toISOString(), today: day_(new Date()) };
+  if (lop) {
+    var cfg = settings_(), n = members.length, today = res.today, mon = monday_(today), weeks = [];
+    var per = members.map(function (m) { return dayStars_(Ls[m]); });
+    for (var w = 0; w < 9; w++) {
+      var start = addDays_(mon, -7 * w), stars = 0, drops = [];
+      for (var i = 0; i < 7; i++) {
+        var dd = addDays_(start, i), played = 0;
+        per.forEach(function (ds) { if (ds[dd]) { stars += ds[dd]; played++; } });
+        if (dd <= today && played * 2 >= n && played > 0) drops.push(dd);
+      }
+      weeks.push({ start: start, stars: stars, drops: drops, ok: stars >= n * cfg.goal && drops.length >= 4 });
+    }
+    res.cls = { lop: lop, n: n, goal: n * cfg.goal, perKid: cfg.goal, weeks: weeks };
+  }
+  return res;
+}
+
+function farmGet_(id) {
+  var sh = sheet_(SH_NT, NT_HEAD), n = sh.getLastRow() - 1;
+  if (n < 1) return null;
+  var ids = sh.getRange(2, 1, n, 1).getValues();
+  for (var i = 0; i < n; i++) {
+    if (String(ids[i][0]) === id) {
+      try { return JSON.parse(String(sh.getRange(i + 2, 4).getValue() || 'null')); } catch (e) { return null; }
+    }
+  }
+  return null;
+}
+
+function farmSave_(id, name, state) {
+  id = str_(id, 60);
+  if (!id || !state || typeof state !== 'object') return { ok: false, error: 'Thiếu dữ liệu nông trại' };
+  var txt = JSON.stringify(state);
+  if (txt.length > 45000) return { ok: false, error: 'Dữ liệu nông trại quá lớn' };
+  var sh = sheet_(SH_NT, NT_HEAD), n = sh.getLastRow() - 1, row = 0;
+  if (n > 0) {
+    var ids = sh.getRange(2, 1, n, 1).getValues();
+    for (var i = 0; i < n; i++) if (String(ids[i][0]) === id) { row = i + 2; break; }
+  }
+  if (row) {
+    var old = null;
+    try { old = JSON.parse(String(sh.getRange(row, 4).getValue() || 'null')); } catch (e) {}
+    if (old && Number(old.t) > Number(state.t)) return { ok: false, stale: true, state: old };
+    sh.getRange(row, 2, 1, 3).setValues([[cleanName_(name), new Date(), txt]]);
+  } else {
+    sh.appendRow([id, cleanName_(name), new Date(), txt]);
+  }
+  return { ok: true };
 }

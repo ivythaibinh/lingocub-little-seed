@@ -206,6 +206,7 @@ button.cell{cursor:pointer;width:100%}
     <button role="tab" data-t="games">Điểm theo trò</button>
     <button role="tab" data-t="log">Nhật ký</button>
     <button role="tab" data-t="students">Học sinh &amp; lớp</button>
+    <button role="tab" data-t="farm">Cây của các lớp</button>
   </nav>
   <section class="panel" id="panel"></section>
 </main>
@@ -357,7 +358,7 @@ function render() {
   saveView();
   document.querySelectorAll("#tabs [data-t]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.t === TAB)));
   renderKPIs();
-  ({ overview: renderOverview, kid: renderKid, games: renderGames, log: renderLog, students: renderStudents })[TAB]();
+  ({ overview: renderOverview, kid: renderKid, games: renderGames, log: renderLog, students: renderStudents, farm: renderFarm })[TAB]();
 }
 
 function renderKPIs() {
@@ -384,6 +385,54 @@ function head(title, desc, extra = "") {
 }
 const csvBtn = id => `<button class="btn" type="button" data-csv="${id}">Tải CSV</button>`;
 const lvl = f => f <= 0 ? "" : f < .34 ? "l1" : f < .67 ? "l2" : f < 1 ? "l3" : "l4";
+
+/* Cây Đại Thụ của các lớp (Nông trại): cùng luật với web của bé —
+   mỗi trò lấy điểm cao nhất trong ngày, tối đa 40 sao / ngày; video Show and Tell +5, 1 lần / Unit.
+   Đạt khi tổng sao tuần ≥ sĩ số × mục tiêu và có ≥ 4 ngày ít nhất một nửa lớp vào học. */
+const addDay = (s, n) => { const d = new Date(s + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const mondayOf = s => addDay(s, -((new Date(s + "T12:00:00Z").getUTCDay() + 6) % 7));
+function kidDayStars() {
+  const out = {}, sat = {};
+  EV.forEach(e => {
+    const k = out[e.id] || (out[e.id] = {}), dd = dayKey(e.t);
+    if (e.type === "Điểm") { const t = k[dd] || (k[dd] = {}), g = e.unit + "|" + e.sec + "|" + e.game; if (!(t[g] >= (e.score || 0))) t[g] = e.score || 0; }
+    if (e.type === "Video" && (e.sec === "Show and Tell" || e.sec === "Practice") && e.unit) { const q = sat[e.id] || (sat[e.id] = {}); if (!q[e.unit] || q[e.unit] > dd) q[e.unit] = dd; }
+  });
+  const res = {};
+  Object.keys(out).forEach(id => { const r = res[id] = {}; Object.keys(out[id]).forEach(dd => { r[dd] = Math.min(40, Object.values(out[id][dd]).reduce((a, b) => a + b, 0)); }); });
+  Object.keys(sat).forEach(id => { const r = res[id] || (res[id] = {}); Object.values(sat[id]).forEach(dd => { r[dd] = (r[dd] || 0) + 5; }); });
+  return res;
+}
+function renderFarm() {
+  const goal = (RAW && RAW.goal) || 40, today = dayKey(new Date()), mon = mondayOf(today), DS = kidDayStars();
+  const list = classes().filter(c => !F.lop || F.lop === c);
+  const week = (ids, start) => {
+    let stars = 0, drops = 0; const per = {};
+    for (let i = 0; i < 7; i++) {
+      const dd = addDay(start, i); let played = 0;
+      ids.forEach(id => { const v = (DS[id] || {})[dd] || 0; if (v) { stars += v; played++; per[id] = (per[id] || 0) + 1; } });
+      if (dd <= today && played > 0 && played * 2 >= ids.length) drops++;
+    }
+    return { stars, drops, per, ok: stars >= ids.length * goal && drops >= 4 };
+  };
+  let html = head("Cây Đại Thụ của các lớp", `Tuần này (từ ${mon.slice(8)}/${mon.slice(5, 7)}) · mục tiêu ${goal} sao / bé / tuần (đổi ở ô B4 trang "Cài đặt") · cần 4 ngày có ít nhất một nửa lớp vào học`, csvBtn("ft"));
+  if (!list.length) { $("#panel").innerHTML = html + `<div class="empty">Chưa có lớp nào. Xếp lớp cho bé ở thẻ "Học sinh &amp; lớp".</div>`; return; }
+  html += `<div class="tbl-wrap"><table id="ft"><thead><tr><th>Lớp</th><th class="r">Sĩ số</th><th class="r">Sao tuần này</th><th class="r">%</th><th class="c">Giọt nước</th><th class="c">Cây</th><th class="c">3 tuần trước</th><th>Bé chưa học tuần này</th></tr></thead><tbody>`;
+  list.forEach(c => {
+    const ids = Object.values(ST).filter(s => s.lop === c).map(s => s.id), w = week(ids, mon), target = ids.length * goal;
+    const past = [1, 2, 3].map(n => week(ids, addDay(mon, -7 * n)).ok ? "🌸" : "·").join(" ");
+    const miss = ids.filter(id => !w.per[id]).map(id => esc(ST[id].name));
+    html += `<tr><td><b>${esc(c)}</b></td><td class="r num">${ids.length}</td><td class="r num">${w.stars} / ${target}</td><td class="r"><span class="sc ${band(target ? w.stars / target * 100 : 0)}">${target ? Math.round(w.stars / target * 100) : 0}%</span></td>` +
+      `<td class="c num">${"💧".repeat(Math.min(4, w.drops))}${"▫️".repeat(Math.max(0, 4 - w.drops))}</td><td class="c">${w.ok ? "🌸 Nở hoa" : "🌳"}</td><td class="c">${past}</td><td class="sub">${miss.length ? miss.join(", ") : "Cả lớp đã học 🎉"}</td></tr>`;
+  });
+  html += `</tbody></table></div>`;
+  if (F.lop) {
+    const ids = Object.values(ST).filter(s => s.lop === F.lop).map(s => s.id), days = [0, 1, 2, 3, 4, 5, 6].map(i => addDay(mon, i));
+    html += `<div style="height:16px"></div><div class="card"><h3>Lớp ${esc(F.lop)} · sao học từng ngày tuần này</h3><div class="tbl-wrap"><table class="mini"><thead><tr><th>Bé</th>${days.map((d, i) => `<th class="r">${["T2", "T3", "T4", "T5", "T6", "T7", "CN"][i]}</th>`).join("")}<th class="r">Tổng</th></tr></thead><tbody>` +
+      ids.map(id => { const r = DS[id] || {}; let t = 0; return `<tr><td>${esc(ST[id].name)}</td>${days.map(d => { const v = r[d] || 0; t += v; return `<td class="r num">${v || (d <= today ? "·" : "")}</td>`; }).join("")}<td class="r num"><b>${t}</b></td></tr>`; }).join("") + `</tbody></table></div></div>`;
+  }
+  $("#panel").innerHTML = html;
+}
 
 /* Tổng quan lớp */
 function renderOverview() {

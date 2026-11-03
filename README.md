@@ -1,13 +1,13 @@
 # Lingo Cub · Little Seed (Unit 1–12)
 
-Web tổng hợp học liệu Little Seed. Trang chủ có 12 Unit; mỗi Unit có 4 mục:
+Web tổng hợp học liệu Little Seed. Có 12 Unit; mỗi Unit có 4 mục:
 
 1. **Warm-up**: Khám phá chủ đề
 2. **Vocabulary**: Bài tập buổi 1 & 2 (Bài 1, Bài 2)
 3. **Story**: Bài tập buổi 3
 4. **Practice**: Bài tập buổi 4 (gồm Show and Tell nếu Unit có)
 
-Bài học mở ngay trong trang Unit; nút **Unit N** ở góc trên trái đưa bé về trang Unit, nút **Tất cả Unit** về trang chủ. Mục đã mở được đánh dấu trên máy đang dùng.
+Trang chủ có 2 nút: **Vào học** (trang chọn Unit, ở `hoc/`) và **Nông trại của bé**. Bài học mở ngay trong trang Unit; nút **Unit N** ở góc trên trái đưa bé về trang Unit, nút **Tất cả Unit** về trang chọn Unit. Mục đã mở được đánh dấu trên máy đang dùng.
 
 ## Danh sách học liệu
 
@@ -31,8 +31,11 @@ Bài học mở ngay trong trang Unit; nút **Unit N** ở góc trên trái đư
 ## Cấu trúc thư mục
 
 ```
-index.html              ← trang chủ 12 Unit
-assets/                 ← hình Leo, Bunny, Buffy, Xiaobao
+index.html              ← trang chủ: logo, Little Seed, nút "Vào học" và "Nông trại của bé"
+hoc/index.html          ← trang chọn 12 Unit (nút "Vào học")
+nong-trai/              ← Nông trại của bé (xem mục "Nông trại" bên dưới)
+assets/                 ← hình Leo, Bunny, Buffy, Xiaobao, lc-track.js
+assets/pixel/           ← font pixel, logo, hình trâu, sư tử MC, kiểu pixel dùng chung
 unit-N/
   index.html            ← trang Unit N (4 mục)
   warm-up/              ← index.html + videos/
@@ -65,3 +68,21 @@ unit-N/
 ### Khi thêm hoặc thay trang bài học
 
 Trang mới cần gắn dòng ghi điểm. Chạy `python3 tools/them-theo-doi.py` (hoặc gửi trang cho Claude làm hộ). Trò mới (không có trong danh sách của tệp này) cần thêm tên vào bảng `VOCAB` của tệp.
+
+## Nông trại của bé (`nong-trai/`)
+
+Bé học để kiếm sao, rồi đổi sao lấy hạt giống, con vật, cây ăn quả, dụng cụ, trang trí và ô đất. Chạm vào mọi thứ trong nông trại để nghe tên tiếng Anh, tiếng Trung (có pinyin) và đọc tên tiếng Việt.
+
+- **Sao học:** 1 câu đúng = 1 sao (Vocab, Practice, quiz truyện), 1 bài khởi động hát hết = 1 sao, video Show and Tell = 5 sao (1 lần / Unit). Mỗi trò chỉ tính lượt cao nhất trong ngày; tối đa 40 sao học / ngày. Sao tự cộng từ điểm các trò đang ghi về Google Sheet, nên bé học trên máy khác vẫn được tính.
+- **Bán nông sản** được thêm sao để mua đồ (tối đa 10 sao / ngày); sao bán hàng không tính lên cấp.
+- **Cấp nông trại** (theo tổng sao học): 0 · 80 · 200 · 350 · 600 · 1.000 · 1.500.
+- **Bỏ học:** 1–2 ngày cây héo, thú buồn (chơi 1 trò là tươi lại); từ 3 ngày cây ngừng lớn, thú ngủ. Không bao giờ mất đồ.
+- **Thời tiết:** tính theo ngày, cả trung tâm cùng một thời tiết, xem trước 2 ngày trên lịch tuần. Ngày xấu (mưa, gió, giông bão, nóng, lạnh, tuyết, sương mù) bé bấm **Dựng đồ che** (cần có đủ đồ và đã chơi 1 trò hôm đó; dựng trước từ hôm trước cũng được). Không che thì lứa đó thu một nửa, trứng sữa hôm đó giảm. Cầu vồng: thu hoạch gấp đôi.
+- **Điểm danh tuần:** học 3 ngày → 3 phân bón; 5 ngày → hạt giống của tuần (không bán trong cửa hàng).
+- **Cây Đại Thụ của lớp:** mỗi tuần, cả lớp cần tổng sao ≥ sĩ số × 40 và ≥ 4 ngày có ít nhất một nửa lớp vào học. Đạt thì mỗi bé nhận 1 món trang trí hiếm. Hệ số 40 đổi ở ô **B4** trang "Cài đặt". Giáo viên xem ở thẻ **Cây của các lớp** trong trang giáo viên.
+- **Xem thử thời tiết:** thêm `?thoitiet=rainy` vào cuối địa chỉ trang nông trại (sunny, cloudy, rainbow, rainy, windy, stormy, hot, cold, snowy, foggy) để xem cảnh và bản tin của kiểu thời tiết đó.
+- **Đổi giá, cấp, tên món:** sửa `nong-trai/data.js`. Âm thanh ở `nong-trai/audio/<id>_en.mp3` và `<id>_zh.mp3`; nguồn giọng ghi ở `nong-trai/audio/SOURCES.md`.
+- **Hình:** con vật, rau quả, thời tiết chuyển từ bộ Fluent Emoji của Microsoft (giấy phép MIT) sang pixel (`nong-trai/img/atlas-*.png`); chuồng, hàng rào, bù nhìn, giếng… vẽ bằng code (`assets/pixel/px.js`). Font VT323 và Silkscreen (giấy phép OFL, kèm trong `assets/pixel/`). Chữ Hán dùng font có sẵn của máy.
+- Nông trại lưu trên máy và trên trang tính **"Nông trại"** của Google Sheet (tự tạo khi bé lưu lần đầu).
+
+**Sau khi cập nhật bản này:** mở Apps Script, thay toàn bộ mã bằng `apps-script/Code.gs` mới → Lưu → Triển khai → Quản lý các bản triển khai → bút chì → Phiên bản mới → Triển khai (link /exec giữ nguyên). Không cần chạy lại `caiDat` (chạy lại cũng được: hàm sẽ thêm ô B4 và trang "Nông trại").

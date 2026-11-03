@@ -11,12 +11,13 @@
   var me = document.currentScript;
   var ROOT = me && me.src ? new URL("../", me.src).href : location.origin + "/";
   var MODE = (me && me.getAttribute("data-mode")) || "kid";
+  var NOCHIP = !!(me && me.getAttribute("data-chip") === "off");
 
   var href = location.href.split(/[?#]/)[0];
   var rel = href.indexOf(ROOT) === 0 ? href.slice(ROOT.length) : location.pathname.replace(/^\//, "");
   var m = rel.match(/^unit-(\d+)\/(?:([a-z0-9-]+)\/)?/);
   var UNIT = m ? +m[1] : 0, SEC = m && m[2] ? m[2] : "";
-  var PAGE = m ? (SEC ? "lesson" : "hub") : (/^(index\.html?)?$/.test(rel) ? "home" : "other");
+  var PAGE = m ? (SEC ? "lesson" : "hub") : (/^((hoc\/)?(index\.html?)?)$/.test(rel) ? "home" : /^nong-trai\//.test(rel) ? "farm" : "other");
   var TOP = true;
   try { TOP = window.top === window; } catch (e) { TOP = false; }
   var SESSION = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
@@ -90,6 +91,26 @@
     return "";
   }
 
+  /* ---------- sổ sao của bé (cho Nông trại) ----------
+     Mỗi trò chỉ tính lượt cao nhất trong ngày: d[ngày][unit|mục|trò] = điểm.
+     Video Show and Tell: sat[unit] = ngày đầu tiên nộp (5 sao, 1 lần / Unit). */
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function day(t) { var d = t ? new Date(t) : new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function starKey(u) { return "lc-stars:" + (u ? u.id : ""); }
+  function ledger() { var u = user(); var L = u ? get(starKey(u), null) : null; return L && L.d ? L : { d: {}, sat: {} }; }
+  function addScore(game, score) {
+    var u = user(); if (!u || MODE !== "kid") return;
+    var L = ledger(), k = UNIT + "|" + SEC + "|" + String(game).slice(0, 80), dd = day();
+    var t = L.d[dd] || (L.d[dd] = {});
+    if (!(t[k] >= score)) t[k] = score;
+    set(starKey(u), L);
+  }
+  function addSat() {
+    var u = user(); if (!u || MODE !== "kid" || !UNIT) return;
+    if (SEC !== "show-and-tell" && SEC !== "practice") return;
+    var L = ledger(); if (!L.sat[UNIT]) { L.sat[UNIT] = day(); set(starKey(u), L); }
+  }
+
   var last = {};
   var LC = window.LC = {
     api: API, root: ROOT, unit: UNIT, section: SEC, page: PAGE,
@@ -101,9 +122,11 @@
       if (last[k] && now - last[k] < 3000) return;
       last[k] = now;
       ev("score", { game: game, score: Number(score) || 0, total: Number(total) || 0, note: note || undefined });
+      addScore(game, Number(score) || 0);
     },
-    record: function (kind, secs, game) { ev(kind === "audio" ? "audio" : "video", { secs: secs, game: game }); },
-    log: ev, flush: flush
+    record: function (kind, secs, game) { ev(kind === "audio" ? "audio" : "video", { secs: secs, game: game }); if (kind !== "audio") addSat(); },
+    log: ev, flush: flush, day: day, ledger: ledger, starKey: starKey, get: get, set: set,
+    login: function () { showLogin(true); }
   };
   if (MODE !== "kid") return;
 
@@ -211,7 +234,7 @@
   }
   function afterLogin(prev) {
     var u = user();
-    if (PAGE === "home" || PAGE === "hub" || (prev && prev.id !== u.id)) { location.reload(); return; }
+    if (PAGE === "home" || PAGE === "hub" || PAGE === "farm" || (prev && prev.id !== u.id)) { location.reload(); return; }
     ev("open", { game: document.title.slice(0, 80) });
     flush();
   }
@@ -280,7 +303,7 @@
   function boot() {
     if (!TOP) { if (PAGE === "lesson" && user()) ev("open", { game: document.title.slice(0, 80) }); return; }
     if (!user()) { showLogin(false); return; }
-    if (PAGE === "home" || PAGE === "hub") { chip(); syncProgress(); }
+    if (PAGE === "home" || PAGE === "hub") { if (!NOCHIP) chip(); syncProgress(); }
     if (PAGE === "lesson") ev("open", { game: document.title.slice(0, 80) });
     flush();
   }
