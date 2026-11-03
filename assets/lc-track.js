@@ -197,7 +197,7 @@
     "font:inherit;font-weight:800;font-size:15px;color:#3A2A00;cursor:pointer;max-width:60vw}" +
     ".lc-chip b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lc-chip small{font-size:12px;opacity:.75;white-space:nowrap}" +
     ".lc-chip i{width:30px;height:30px;border-radius:50%;background:#4F9A55;color:#fff;display:grid;place-items:center;font-style:normal;font-size:15px}" +
-    ".lc-chip.fixed{position:fixed;top:max(10px,env(safe-area-inset-top,0px));right:max(10px,env(safe-area-inset-right,0px));z-index:40;box-shadow:0 3px 0 #EAD7B8}" +
+    ".lc-chip{box-shadow:0 3px 0 #EAD7B8}" +
     "[hidden]{display:none!important}";
 
   function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
@@ -270,9 +270,11 @@
     var b = el("button", "lc-chip", "<i>🌱</i><b>" + esc(u.name) + "</b><small>Đổi bé</small>");
     b.type = "button"; b.title = "Đổi bé đang học";
     b.addEventListener("click", function () { showLogin(true); });
+    var a = el("a", "lc-chip", "<i>⭐</i><b>Tiến độ của bé</b>");
+    a.href = ROOT + "tien-do/"; a.style.textDecoration = "none";
     var nav = document.querySelector(".topnav");
-    if (nav && PAGE === "hub") { var pn = nav.querySelector(".pn"); nav.insertBefore(b, pn || null); }
-    else { b.classList.add("fixed"); document.body.appendChild(b); }
+    if (nav && PAGE === "hub") { var pn = nav.querySelector(".pn"); var w = el("div"); w.style.cssText = "display:flex;gap:8px;flex-wrap:wrap"; w.appendChild(b); w.appendChild(a); nav.insertBefore(w, pn || null); }
+    else { var w2 = el("div"); w2.style.cssText = "display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:1040px;margin:0 auto;padding:12px 16px 0"; w2.appendChild(a); w2.appendChild(b); var mw = document.querySelector("main"); if (mw) mw.parentNode.insertBefore(w2, mw); else document.body.insertBefore(w2, document.body.firstChild); }
   }
 
   function boot() {

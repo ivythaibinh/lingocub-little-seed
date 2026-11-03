@@ -128,6 +128,7 @@ function doGet(e) {
   var p = (e && e.parameter) || {};
   try {
     if (p.action === 'progress') return json_({ ok: true, progress: progress_(p.id) });
+    if (p.action === 'kid') return json_(kid_(p.id));
     if (p.action === 'data') { checkKey_(p.key); return json_(data_(p.days)); }
     return json_({ ok: true, app: 'lingocub-little-seed', time: new Date().toISOString() });
   } catch (err) {
@@ -269,4 +270,15 @@ function data_(days) {
     };
   });
   return { ok: true, students: st, classes: settings_().classes, events: ev, cols: EV_HEAD.slice(0, 12), time: new Date().toISOString() };
+}
+
+/* Trang "Tiến độ của bé" cho phụ huynh: chỉ trả dữ liệu của đúng một bé (biết SĐT + tên bé) */
+function kid_(id) {
+  id = String(id || '');
+  if (!id) return { ok: false, error: 'Thiếu mã bé' };
+  var ev = events_().filter(function (r) { return String(r[1]) === id && r[0] instanceof Date; })
+    .map(function (r) { return [r[0].toISOString()].concat(r.slice(1, 12)); });
+  var k = null;
+  students_().list.forEach(function (s) { if (s.id === id) k = s; });
+  return { ok: true, name: k ? k.name : '', lop: k ? k.lop : '', events: ev, time: new Date().toISOString() };
 }
