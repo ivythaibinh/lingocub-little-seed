@@ -829,7 +829,7 @@ function home(){
       <div class="meta"><b>${g.name}</b><span>${g.sub}</span></div></button>`).join('')}
     <button class="gcard names" type="button" data-g="names">
       <div class="art" style="display:grid;place-items:center"><div class="gang" style="height:150px">${['xiaobao','bunny'].map(k=>`<img src="${IMG(k)}" alt="">`).join('')}</div></div>
-      <div class="meta"><span class="tag" style="position:static;justify-self:start">Khám phá</span><b>Tên của bé bằng tiếng Trung và tiếng Anh</b>
+      <div class="meta"><span class="tag" style="position:static;justify-self:start">Show and Tell</span><b>Tên của bé bằng tiếng Trung và tiếng Anh</b>
         <span>Nhập hoặc nói tên tiếng Việt. Ví dụ: Phạm Ánh Dương → <span class="zh">范映阳</span> · Sunshine</span></div></button>
   </section>
   ${notesHTML()}`;
@@ -848,7 +848,7 @@ function notesHTML(){
     <h3>Hai cách tính tuổi của người Trung Quốc</h3>
     <p>Tuổi âm lịch (虚岁 xūsuì) tính thêm một tuổi từ lúc em bé còn trong bụng mẹ và thêm một tuổi mỗi dịp Tết Âm lịch; tuổi dương lịch (周岁 zhōusuì) tính theo ngày sinh. Hiện nay nhiều người Trung Quốc dùng tuổi dương lịch. Với bé, thầy cô chỉ cần kể vui: “Ở Trung Quốc ngày xưa, Tết đến là cả nhà cùng thêm một tuổi.” Trong trò chơi, tuổi luôn là tuổi dương lịch để bé không bị lẫn.</p>
     <h3>Tên tiếng Trung có ý nghĩa</h3>
-    <p>Họ theo họ bố; tên riêng chọn chữ có ý nghĩa đẹp: bé trai hay dùng 龙 long, 虎 hổ, 飞 phi, 海 hải, 强 cường, 伟 vĩ; bé gái hay dùng 丽 lệ, 红 hồng, 燕 yến, 静 tĩnh, 月 nguyệt. Mục “Khám phá tên” đổi tên tiếng Việt sang tiếng Trung theo âm Hán–Việt và hiện nghĩa của từng chữ.</p>
+    <p>Họ theo họ bố; tên riêng chọn chữ có ý nghĩa đẹp: bé trai hay dùng 龙 long, 虎 hổ, 飞 phi, 海 hải, 强 cường, 伟 vĩ; bé gái hay dùng 丽 lệ, 红 hồng, 燕 yến, 静 tĩnh, 月 nguyệt. Mục “Show and Tell” đổi tên tiếng Việt sang tiếng Trung theo âm Hán–Việt và hiện nghĩa của từng chữ.</p>
     <h3>Nhân vật và tuổi trong bài</h3>
     <p>${ALL_KIDS.map(c=>`${CH[c][0]} (<span class="zh">${CH[c][1]}</span>) ${CH[c][3]} tuổi`).join(' · ')}</p>
   </div></details>`;
@@ -860,7 +860,7 @@ const GUIDE = {
   g1:{t:'Xe tuần lộc chở quà', s:['Đêm Giáng sinh, Buffy, Leo và Xiaobao đi phát quà!','Xe của Buffy đã có sẵn một hộp quà. Bé bấm loa nghe xem đó là số mấy.','Bé bấm loa nghe từng hộp quà ở dưới, rồi kéo hộp quà cùng số vào xe của Leo (tiếng Anh) và xe của Xiaobao (tiếng Trung).','Đủ quà rồi, tuần lộc kéo xe bay đi phát quà!']},
   g2:{t:'Tiệm bánh của Bunny', s:['Bé là đầu bếp Bunny. Khách đến tiệm đặt bánh sinh nhật.','Bé bấm loa nghe khách giới thiệu tên và tuổi.','Bé bấm loa nghe câu hỏi. Bé bấm vào từng hộp nến để nghe số, rồi kéo hộp đúng tuổi của khách vào bánh.','Đúng thì khách vui, bé được thêm sao. Sai thì khách giận, bé mất một sao.']},
   g3:{t:'Phiên dịch viên nhí', s:['Hai bạn nói hai thứ tiếng khác nhau nên không hiểu nhau. Bé cùng Leo, Buffy, Bunny và Xiaobao làm phiên dịch nhé!','Mỗi câu có một bạn đứng giữa làm phiên dịch. Bé bấm loa nghe bạn nói.','Bé chọn câu cùng nghĩa bằng thứ tiếng của bạn kia. Bạn phiên dịch sẽ nói lại câu đó, rồi câu chạy theo sợi dây sang bạn kia.','Chưa hiểu, bé chạm vào bạn phiên dịch để nghe nghĩa tiếng Việt.']},
-  names:{t:'Khám phá tên', s:['Bố mẹ hoặc thầy cô gõ tên tiếng Việt của bé (có dấu), hoặc bấm mic để bé nói tên.','Bấm “Đổi tên” để xem tên tiếng Trung và tên tiếng Anh của bé.','Chữ Hán nào có nhiều cách viết, bé chạm để chọn chữ mình thích.','Chọn tuổi của bé để nghe câu tự giới thiệu: 我叫… 我…岁 / My name is… I’m … years old.']},
+  names:{t:'Show and Tell', s:['Bố mẹ hoặc thầy cô gõ tên tiếng Việt của bé (có dấu), hoặc bấm mic để bé nói tên.','Bấm “Đổi tên” để xem tên tiếng Trung và tên tiếng Anh của bé.','Chữ Hán nào có nhiều cách viết, bé chạm để chọn chữ mình thích.','Chọn tuổi của bé để nghe câu tự giới thiệu: 我叫… 我…岁 / My name is… I’m … years old.']},
 };
 const gdlg = $('#guide');
 $('#helpBtn').onclick = () => {
