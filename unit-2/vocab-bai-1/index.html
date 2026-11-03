@@ -1,4 +1,5 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head>
+<script src="../../assets/lc-track.js"></script><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Little Seed Unit 2 Bài 1</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -968,7 +969,7 @@ const Fruits = (() => {
       setTimeout(sayPrompt, 450);
     }
   }
-  function finish(){
+  function finish(){window.LC&&LC.score('Flying Fruits',got,ROUNDS);/*LC*/
     fruits.forEach(f => f.el.remove()); fruits = [];
     sky.hidden = true;
     const end = $('#frEnd'); end.hidden = false;
@@ -1041,7 +1042,7 @@ const Fruits = (() => {
       if (found === N) finish(); else fb('Lật tiếp 2 thẻ nhé.');
     }, match ? 1300 : 2100);
   }
-  function finish(){
+  function finish(){window.LC&&LC.score('Matching Tiles',Math.round(N*right/Math.max(1,tries)),N,'Chọn đúng '+right+'/'+tries+' lần');/*LC*/
     $('#mtPlay').hidden = true;
     const end = $('#mtEnd'); end.hidden = false;
     const score = Math.round(N * right / Math.max(1, tries));
@@ -1129,7 +1130,7 @@ const Quiz = (() => {
     setTimeout(() => { const a = q.ans || q.w; q.dir==='en2zh' ? sayZh(a) : sayEn(a); }, 450);
     setTimeout(() => { qi++; qi < qs.length ? show() : finish(); }, 2300);
   }
-  function finish(){
+  function finish(){window.LC&&LC.score('Head-tilt Quiz',score,6);/*LC*/
     $('#qzPlay').hidden = true;
     const end = $('#qzEnd'); end.hidden = false;
     end.innerHTML = `<h2>${score>=5?'Excellent! 太棒了！':score>=3?'Good job! 很好！':'Keep going! 加油！'}</h2><p>Đúng <b>${score}/6</b> câu</p><div class="big-stars">${starsHTML(score,6)}</div><div class="row" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><button class="btn" id="qzAgain">Chơi lại</button><button class="btn ghost" id="qzBack">Đổi cách chơi</button></div>`;
@@ -1327,7 +1328,7 @@ const Whack = (() => {
     h.btn.addEventListener('pointerdown', e => { e.preventDefault(); hit(h); });
     h.btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); hit(h); } });
   });
-  function finish(){
+  function finish(){window.LC&&LC.score('Whack-a-mole',got,ROUNDS);/*LC*/
     field.hidden = true;
     const end = $('#wmEnd'); end.hidden = false;
     end.innerHTML = `<h2>${got>=8?'Excellent! 太棒了！':got>=5?'Good job! 很好！':'Keep going! 加油！'}</h2><p>Đập đúng ngay lần đầu <b>${got}/${ROUNDS}</b> chú chuột</p><div class="big-stars">${starsHTML(got,ROUNDS)}</div><button class="btn" id="wmAgain">Chơi lại</button>`;
@@ -1429,7 +1430,7 @@ const Tug = (() => {
       if (!sec.hidden) q.dir === 'en2zh' ? sayZh(q.w) : sayEn(q.w);
     });
   }
-  function finish(win){
+  function finish(win){window.LC&&LC.score('Kéo co',(win?lives:0),LIVES,win?'Thắng, còn '+lives+' tim':'Thua');/*LC*/
     $('#tgQ').hidden = true;
     if (win){ mon.classList.add('ko','fall'); kid.classList.add('jump'); FX.hammer(); setTimeout(FX.dizzy, 200); setTimeout(FX.whistle, 900); }
     else { kid.classList.add('fall'); mon.classList.add('jump'); }
@@ -1565,7 +1566,7 @@ const Unjumble = (() => {
     $('#ujSlots').classList.remove('win'); $('#ujDone').hidden = true; $('#ujNext').hidden = true;
     header(); slots(); spawn();
   }
-  function finish(){
+  function finish(){window.LC&&LC.score('Unjumble',got,N);/*LC*/
     $('#ujPlay').hidden = true;
     const end = $('#ujEnd'); end.hidden = false;
     end.innerHTML = `<h2>${got>=N-1?'Excellent! 太棒了！':got>=N/2?'Good job! 很好！':'Keep going! 加油！'}</h2><p>Bắt đúng ngay lần đầu <b>${got}/${N}</b> câu</p><div class="big-stars">${starsHTML(got,N)}</div><button class="btn" id="ujAgain">Chơi lại</button>`;
@@ -1679,7 +1680,7 @@ const OpenBox = (() => {
     $('#obRound').textContent = `${Math.min(round + 1, N)}/${N}`;
     if (round >= N) finish();
   }
-  function finish(){
+  function finish(){window.LC&&LC.score('Open the Box',got,N);/*LC*/
     started = false; sky.hidden = true;
     const end = $('#obEnd'); end.hidden = false;
     end.innerHTML = `<h2>${got>=N-1?'Excellent! 太棒了！':got>=N/2?'Good job! 很好！':'Keep going! 加油！'}</h2><p>Trả lời đúng ngay lần đầu <b>${got}/${N}</b> hộp quà</p><div class="big-stars">${starsHTML(got,N)}</div><button class="btn" id="obAgain">Chơi lại</button>`;

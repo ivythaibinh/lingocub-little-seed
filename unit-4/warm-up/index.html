@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="vi">
 <head>
+<script src="../../assets/lc-track.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lingo Cub Warm-up · Unit 4</title>
@@ -700,7 +701,7 @@ function next() {
 function finish(allDone) {
   setPlayingUI(false);
   clearKaraoke();
-  const n = done.size, total = VIDEOS.length, miss = missing();
+  const n = done.size, total = VIDEOS.length, miss = missing();window.LC&&LC.score('Hát khởi động',n,total,'sao');/*LC*/
   const pb = $("praiseStars"); pb.innerHTML = "";
   VIDEOS.forEach((v, i) => { pb.insertAdjacentHTML("beforeend", STAR_SVG); if (done.has(i)) pb.lastElementChild.classList.add("on"); });
   if (n === total) {

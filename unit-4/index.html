@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="vi">
 <head>
+<script src="../assets/lc-track.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Unit 4 · Cơ thể</title>
@@ -187,7 +188,7 @@ const LINKS = {
 };
 const PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>';
 const TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
-const KEY = "lingocub-unit4-done";
+const KEY = window.LC ? LC.doneKey(4) : "lingocub-unit4-done";/*LC*/
 function loadDone(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {}; }catch(e){ return {}; } }
 function saveDone(d){ try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){} }
 let done = loadDone();
@@ -224,6 +225,7 @@ document.getElementById("back").addEventListener("click", () => {
 });
 document.getElementById("reset").addEventListener("click", () => { done = {}; saveDone(done); paint(); });
 window.addEventListener("hashchange", route);
+window.addEventListener("lc-progress", () => { done = loadDone(); paint(); });
 paint(); route();
 </script>
 </body>

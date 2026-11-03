@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Theo dõi học tập · Little Seed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@500;600;700;800&display=swap">
+<script src="../assets/lc-track.js" data-mode="teacher"></script>
+<style>
+[hidden]{display:none!important}
+:root{
+  color-scheme:light;
+  --bg:#FFF7E8; --surface:#FFFFFF; --surface-2:#FBF3E4; --line:#EAD7B8; --line-2:#F2E6D0;
+  --ink:#2F241B; --ink-2:#6B5848; --ink-3:#988573;
+  --leaf:#3F8A46; --leaf-ink:#fff; --sun:#FFC94A;
+  --s100:#cde2fb; --s150:#b7d3f6; --s250:#86b6ef; --s350:#5598e7; --s450:#2a78d6; --s550:#1c5cab;
+  --bar:#2a78d6;
+  --good:#0ca30c; --warn:#fab219; --crit:#d03b3b;
+  --f-display:"Baloo 2","Nunito",system-ui,sans-serif;
+  --f-body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#1B1713; --surface:#26201A; --surface-2:#2E271F; --line:#463A2E; --line-2:#3A3027;
+  --ink:#F3E9DA; --ink-2:#C9B8A2; --ink-3:#9C8A75; --leaf:#5FA864;
+  --s100:#16324f; --s150:#184170; --s250:#1c5cab; --s350:#2a78d6; --s450:#5598e7; --s550:#86b6ef;
+  --bar:#3987e5 }}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#1B1713; --surface:#26201A; --surface-2:#2E271F; --line:#463A2E; --line-2:#3A3027;
+  --ink:#F3E9DA; --ink-2:#C9B8A2; --ink-3:#9C8A75; --leaf:#5FA864;
+  --s100:#16324f; --s150:#184170; --s250:#1c5cab; --s350:#2a78d6; --s450:#5598e7; --s550:#86b6ef;
+  --bar:#3987e5 }
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+.num{font-variant-numeric:tabular-nums}
+
+/* Đầu trang */
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 280px}
+.brand img{width:44px;height:auto}
+.brand h1{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(20px,3.4vw,28px);line-height:1.05}
+.brand small{display:block;color:var(--ink-2);font-weight:700;font-size:13px}
+.btn{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:999px;border:2px solid var(--line);background:var(--surface);font-weight:800;font-size:14px}
+.btn.pri{background:var(--leaf);border-color:var(--leaf);color:var(--leaf-ink)}
+.btn svg{width:18px;height:18px}
+.stamp{color:var(--ink-3);font-size:12px;font-weight:700}
+
+/* Khoá */
+.lock{min-height:100vh;display:grid;place-items:center;padding:16px}
+.lock form{width:min(400px,100%);background:var(--surface);border:2px solid var(--line);border-radius:24px;padding:24px;display:grid;gap:14px;box-shadow:0 6px 0 var(--line)}
+.lock h1{margin:0;font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1.1}
+.lock p{margin:0;color:var(--ink-2);font-weight:600;font-size:14px}
+.lock input[type=password]{width:100%;font-size:20px;padding:10px 14px;border:2px solid var(--line);border-radius:14px;background:var(--surface-2)}
+.lock label.ck{display:flex;gap:8px;align-items:center;font-weight:700;font-size:14px;color:var(--ink-2)}
+.err{color:var(--crit);font-weight:800;font-size:14px;min-height:1.2em}
+.note{background:var(--surface-2);border:2px dashed var(--line);border-radius:14px;padding:10px 12px;font-size:13px;font-weight:700;color:var(--ink-2)}
+
+/* Bộ lọc */
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:14px;position:sticky;top:0;z-index:5}
+.filters label{display:grid;gap:3px;font-size:12px;font-weight:800;color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em}
+.filters select,.filters input{min-height:40px;border:2px solid var(--line);border-radius:12px;background:var(--surface-2);padding:0 10px;font-size:15px;font-weight:700;text-transform:none;letter-spacing:0;color:var(--ink);min-width:120px;max-width:220px}
+.seg{display:inline-flex;border:2px solid var(--line);border-radius:12px;overflow:hidden;min-height:40px}
+.seg button{border:0;background:var(--surface-2);padding:0 12px;font-weight:800;font-size:14px;color:var(--ink-2);white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--leaf);color:var(--leaf-ink)}
+.filters .grow{flex:1}
+@media (max-width:760px){
+  .filters{position:static;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+  .filters select,.filters input{max-width:none;width:100%;min-width:0}
+  .filters .grow{grid-column:1/-1}
+  .seg{width:100%}.seg button{flex:1;padding:0 4px;font-size:13px}
+}
+
+/* Thẻ số */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:12px 14px}
+.kpi b{display:block;font-family:var(--f-display);font-weight:800;font-size:30px;line-height:1.1}
+.kpi span{color:var(--ink-2);font-weight:700;font-size:13px}
+
+/* Thẻ mục */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 16px;font-weight:800;font-size:14px;color:var(--ink-2)}
+.tabs button[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.panel{background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:14px}
+.phead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.phead h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:21px;line-height:1.1}
+.phead p{margin:2px 0 0;color:var(--ink-2);font-size:13px;font-weight:600}
+.empty{padding:28px 10px;text-align:center;color:var(--ink-2);font-weight:700}
+
+/* Bảng */
+.tbl-wrap{overflow:auto;border:1px solid var(--line-2);border-radius:14px;max-height:70vh}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:14px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line-2);white-space:nowrap;vertical-align:middle}
+thead th{position:sticky;top:0;background:var(--surface-2);font-size:12px;font-weight:800;color:var(--ink-2);text-transform:uppercase;letter-spacing:.03em;z-index:2}
+thead th.sortable{cursor:pointer}
+tbody tr:hover td{background:var(--surface-2)}
+td.r,th.r{text-align:right}
+td.c,th.c{text-align:center}
+.kid{font-weight:800;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px;background:none;border:0;padding:0;text-align:left}
+.sub{color:var(--ink-3);font-size:12px;font-weight:700}
+th.stick,td.stick{position:sticky;left:0;background:var(--surface);z-index:1}
+thead th.stick{z-index:3;background:var(--surface-2)}
+
+/* Ô tiến độ */
+.cell{display:grid;place-items:center;min-width:58px;padding:4px 6px;border-radius:10px;font-weight:800;font-size:13px;line-height:1.15;border:0;background:var(--surface-2);color:var(--ink-3)}
+button.cell{cursor:pointer;width:100%}
+.cell small{font-size:11px;font-weight:800;opacity:.9}
+.cell.l1{background:var(--s100);color:var(--ink)}
+.cell.l2{background:var(--s150);color:var(--ink)}
+.cell.l3{background:var(--s250);color:var(--ink)}
+.cell.l4{background:var(--s450);color:#fff}
+:root[data-theme="dark"] .cell.l1,:root[data-theme="dark"] .cell.l2,:root[data-theme="dark"] .cell.l3{color:var(--ink)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:12px;font-weight:700;color:var(--ink-2)}
+.legend i{display:inline-block;width:18px;height:12px;border-radius:4px;vertical-align:-2px;margin-right:4px}
+
+/* Điểm */
+.sc{display:inline-flex;align-items:center;gap:6px;font-weight:800}
+.sc::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--d,transparent);flex:none}
+.sc.good{--d:var(--good)}.sc.warn{--d:var(--warn)}.sc.crit{--d:var(--crit)}
+.tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:800;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-2)}
+
+/* Chi tiết bé */
+.kgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:14px;margin-bottom:14px}
+@media (max-width:820px){.kgrid{grid-template-columns:minmax(0,1fr)}}
+.card{border:1px solid var(--line-2);border-radius:16px;padding:12px 14px;background:var(--surface)}
+.card h3{margin:0 0 8px;font-family:var(--f-display);font-weight:800;font-size:18px}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px}
+.facts dt{color:var(--ink-2);font-weight:700}.facts dd{margin:0;font-weight:800}
+.unitbox{border:1px solid var(--line-2);border-radius:16px;margin-bottom:12px;overflow:hidden}
+.unitbox>summary{list-style:none;cursor:pointer;display:flex;gap:10px;align-items:center;padding:10px 14px;background:var(--surface-2);font-weight:800}
+.unitbox>summary::-webkit-details-marker{display:none}
+.unitbox>summary .u{font-family:var(--f-display);font-size:18px}
+.unitbox>summary .grow{flex:1}
+.unitbox .inner{padding:10px 14px;display:grid;gap:10px}
+.secrow{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;align-items:start}
+@media (max-width:640px){.secrow{grid-template-columns:minmax(0,1fr)}}
+.secname{font-weight:800}
+.secname .sub{display:block}
+.mini td,.mini th{padding:5px 8px;font-size:13px}
+.mini thead th{position:static}
+
+/* Biểu đồ */
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .grid{stroke:var(--line-2);stroke-width:1}
+.chart .ax{fill:var(--ink-3);font-size:11px;font-weight:700;font-family:var(--f-body)}
+.chart .bar{fill:var(--bar)}
+.chart .hit{fill:transparent}
+.chart .hit:hover+.bar,.chart g:hover .bar{opacity:.8}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;font-weight:800;padding:5px 9px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-100%);margin-top:-8px;z-index:4}
+
+/* Học sinh */
+.lopin{min-height:34px;border:2px solid var(--line);border-radius:10px;background:var(--surface-2);padding:0 8px;width:130px;font-weight:700}
+.saved{color:var(--good);font-weight:800;font-size:12px}
+.demo-bar{background:#FFF1C4;color:#3A2A00;border:2px solid var(--sun);border-radius:14px;padding:8px 12px;font-weight:800;font-size:13px;margin-bottom:12px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<section class="lock" id="lock">
+  <form id="lockForm">
+    <img src="../assets/leo.webp" alt="" width="64" style="justify-self:start">
+    <h1>Trang giáo viên<br>Theo dõi học tập Little Seed</h1>
+    <p>Nhập mật khẩu giáo viên (ô B1 trang “Cài đặt” trong Google Sheet).</p>
+    <input type="password" id="pw" autocomplete="current-password" placeholder="Mật khẩu">
+    <label class="ck"><input type="checkbox" id="remember" checked> Nhớ mật khẩu trên máy này</label>
+    <div class="err" id="lockErr" aria-live="polite"></div>
+    <button class="btn pri" type="submit" style="justify-content:center;min-height:48px;font-size:16px">Mở dashboard</button>
+    <div class="note" id="noApi" hidden>Web chưa nối với Google Sheet (dòng <b>API</b> trong <code>assets/lc-track.js</code> còn trống). Bấm “Xem dữ liệu mẫu” để xem trước dashboard với số liệu giả.</div>
+    <button class="btn" type="button" id="demoBtn" style="justify-content:center">Xem dữ liệu mẫu</button>
+  </form>
+</section>
+
+<main class="wrap" id="app" hidden>
+  <header class="top">
+    <div class="brand"><img src="../assets/leo.webp" alt=""><div><h1>Theo dõi học tập · Little Seed</h1><small id="stamp" class="stamp"></small></div></div>
+    <button class="btn" id="reload" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>Tải lại</button>
+    <button class="btn" id="logout" type="button">Thoát</button>
+  </header>
+  <div class="demo-bar" id="demoBar" hidden>Đang xem DỮ LIỆU MẪU (số liệu giả). Khi nối Google Sheet, dashboard sẽ hiện dữ liệu thật của các bé.</div>
+
+  <section class="filters" aria-label="Bộ lọc">
+    <label>Lớp<select id="fLop"></select></label>
+    <label>Bé<select id="fKid"></select></label>
+    <label>Unit<select id="fUnit"></select></label>
+    <label>Thời gian<span class="seg" id="fDays">
+      <button type="button" data-d="7">7 ngày</button><button type="button" data-d="30">30 ngày</button><button type="button" data-d="0">Tất cả</button></span></label>
+    <label class="grow">Tìm tên bé<input id="fQ" type="search" placeholder="Gõ tên…" style="max-width:none;width:100%"></label>
+  </section>
+
+  <section class="kpis" id="kpis" aria-label="Tóm tắt"></section>
+
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-t="overview">Tổng quan lớp</button>
+    <button role="tab" data-t="kid">Chi tiết từng bé</button>
+    <button role="tab" data-t="games">Điểm theo trò</button>
+    <button role="tab" data-t="log">Nhật ký</button>
+    <button role="tab" data-t="students">Học sinh &amp; lớp</button>
+  </nav>
+  <section class="panel" id="panel"></section>
+</main>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const API = (window.LC && LC.api) || "";
+const UNITS = [null,
+  ["Greetings", "Chào hỏi"], ["Name & Age", "Tên và tuổi"], ["My Family", "Gia đình"], ["My Body", "Cơ thể"],
+  ["Feelings", "Cảm xúc"], ["My School", "Trường học"], ["My Home", "Đồ đạc trong nhà"], ["Animals & Actions", "Động vật"],
+  ["Food & Drink", "Đồ ăn, đồ uống"], ["Weather", "Thời tiết"], ["Colors", "Màu sắc"], ["Counting", "Số đếm"]];
+const SECS = ["Warm-up", "Vocab Bài 1", "Vocab Bài 2", "Story", "Practice", "Show and Tell"];
+const SAT = [3, 4, 6, 7, 8];
+const secsOf = u => SAT.includes(+u) ? SECS : SECS.slice(0, 5);
+const TZ = "Asia/Ho_Chi_Minh";
+const fmtT = d => d ? d.toLocaleString("vi-VN", { timeZone: TZ, hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" }) : "—";
+const fmtD = d => d ? d.toLocaleDateString("vi-VN", { timeZone: TZ, day: "2-digit", month: "2-digit", year: "numeric" }) : "—";
+const dayKey = d => d.toLocaleDateString("en-CA", { timeZone: TZ });
+const mins = s => s >= 3600 ? (s / 3600).toFixed(1).replace(".", ",") + " giờ" : s >= 60 ? Math.round(s / 60) + " phút" : Math.round(s) + " giây";
+const band = p => p == null ? "" : p >= 80 ? "good" : p >= 50 ? "warn" : "crit";
+const pctTxt = p => p == null ? "—" : Math.round(p) + "%";
+
+let KEY = "", RAW = null, DEMO = false, TAB = "overview";
+const F = { lop: "", kid: "", unit: 0, days: 30, q: "" };
+try { const s = JSON.parse(localStorage.getItem("lc-teacher-view") || "{}"); Object.assign(F, s.F || {}); TAB = s.TAB || TAB; } catch (e) {}
+function saveView() { try { localStorage.setItem("lc-teacher-view", JSON.stringify({ F: { lop: F.lop, unit: F.unit, days: F.days }, TAB })); } catch (e) {} }
+
+/* ---------- Khoá & tải dữ liệu ---------- */
+if (!API) $("#noApi").hidden = false;
+try { KEY = localStorage.getItem("lc-teacher-key") || ""; } catch (e) {}
+if (KEY && API) load(true);
+
+$("#lockForm").addEventListener("submit", e => {
+  e.preventDefault();
+  if (!API) { $("#lockErr").textContent = "Chưa có link Google Sheet. Xem dữ liệu mẫu trước nhé."; return; }
+  KEY = $("#pw").value.trim();
+  if (!KEY) { $("#lockErr").textContent = "Nhập mật khẩu."; return; }
+  load(true);
+});
+$("#demoBtn").addEventListener("click", () => { DEMO = true; RAW = demoData(); start(); });
+$("#reload").addEventListener("click", () => DEMO ? (RAW = demoData(), render()) : load(false));
+$("#logout").addEventListener("click", () => { try { localStorage.removeItem("lc-teacher-key"); } catch (e) {} location.reload(); });
+
+function load(first) {
+  const err = $("#lockErr"); err.textContent = first ? "Đang tải…" : "";
+  $("#stamp").textContent = "Đang tải dữ liệu…";
+  fetch(API + "?action=data&key=" + encodeURIComponent(KEY))
+    .then(r => r.json())
+    .then(j => {
+      if (!j.ok) throw new Error(j.error || "Không đọc được dữ liệu");
+      RAW = j; err.textContent = "";
+      if ($("#remember").checked) try { localStorage.setItem("lc-teacher-key", KEY); } catch (e) {}
+      start();
+    })
+    .catch(e => {
+      if (!$("#app").hidden) { $("#stamp").textContent = "Lỗi tải: " + e.message; return; }
+      $("#lock").hidden = false;
+      err.textContent = /mật khẩu/i.test(e.message) ? "Sai mật khẩu." : "Không tải được: " + e.message;
+      try { localStorage.removeItem("lc-teacher-key"); } catch (x) {}
+    });
+}
+
+/* ---------- Chuẩn hoá dữ liệu ---------- */
+let ST = {}, EV = [];
+function start() {
+  ST = {};
+  (RAW.students || []).forEach(s => { ST[s.id] = { ...s, first: s.first ? new Date(s.first) : null, last: s.last ? new Date(s.last) : null }; });
+  EV = (RAW.events || []).map(r => ({
+    t: new Date(r[0]), id: String(r[1]), name: String(r[2]), unit: +r[3] || 0, sec: String(r[4] || ""), type: String(r[5] || ""),
+    game: String(r[6] || ""), score: r[7] === "" ? null : +r[7], total: r[8] === "" ? null : +r[8], pct: r[9] === "" ? null : +r[9],
+    secs: +r[10] || 0, note: String(r[11] || "")
+  })).filter(e => !isNaN(e.t));
+  EV.forEach(e => { if (!ST[e.id]) ST[e.id] = { id: e.id, name: e.name, phone: e.id.split("-")[0], lop: "", first: e.t, last: e.t }; });
+  $("#lock").hidden = true; $("#app").hidden = false; $("#demoBar").hidden = !DEMO;
+  $("#stamp").textContent = (DEMO ? "Dữ liệu mẫu" : "Cập nhật lúc " + fmtT(new Date(RAW.time || Date.now()))) + " · " + EV.length + " dòng nhật ký";
+  fillFilters(); render();
+}
+
+function classes() {
+  const set = new Set(RAW.classes || []);
+  Object.values(ST).forEach(s => s.lop && set.add(s.lop));
+  return [...set].sort((a, b) => a.localeCompare(b, "vi"));
+}
+function kidsIn() {
+  const q = F.q.trim().toLowerCase();
+  return Object.values(ST)
+    .filter(s => !F.lop || (F.lop === "__none" ? !s.lop : s.lop === F.lop))
+    .filter(s => !q || s.name.toLowerCase().includes(q))
+    .sort((a, b) => a.name.localeCompare(b.name, "vi"));
+}
+function fillFilters() {
+  const cl = classes();
+  if (F.lop && F.lop !== "__none" && !cl.includes(F.lop)) F.lop = "";
+  $("#fLop").innerHTML = `<option value="">Tất cả lớp</option>` + cl.map(c => `<option${c === F.lop ? " selected" : ""}>${esc(c)}</option>`).join("") +
+    `<option value="__none"${F.lop === "__none" ? " selected" : ""}>Chưa xếp lớp</option>`;
+  const ks = kidsIn();
+  if (F.kid && !ks.some(k => k.id === F.kid)) F.kid = "";
+  $("#fKid").innerHTML = `<option value="">Tất cả bé (${ks.length})</option>` + ks.map(k => `<option value="${esc(k.id)}"${k.id === F.kid ? " selected" : ""}>${esc(k.name)}${k.lop ? " · " + esc(k.lop) : ""}</option>`).join("");
+  $("#fUnit").innerHTML = `<option value="0">Tất cả Unit</option>` + UNITS.slice(1).map((u, i) => `<option value="${i + 1}"${i + 1 === +F.unit ? " selected" : ""}>Unit ${i + 1} · ${esc(u[1])}</option>`).join("");
+  document.querySelectorAll("#fDays button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.d === +F.days)));
+}
+$("#fLop").addEventListener("change", e => { F.lop = e.target.value; F.kid = ""; fillFilters(); render(); });
+$("#fKid").addEventListener("change", e => { F.kid = e.target.value; if (F.kid && TAB === "overview") TAB = "kid"; render(); });
+$("#fUnit").addEventListener("change", e => { F.unit = +e.target.value; render(); });
+$("#fDays").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; F.days = +b.dataset.d; fillFilters(); render(); });
+$("#fQ").addEventListener("input", e => { F.q = e.target.value; fillFilters(); render(); });
+$("#tabs").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (!b) return; TAB = b.dataset.t; render(); });
+
+/* Sự kiện sau khi lọc */
+function since() { return F.days ? Date.now() - F.days * 86400000 : 0; }
+function filtered(opts = {}) {
+  const ids = new Set(kidsIn().map(k => k.id)), t0 = since();
+  return EV.filter(e => ids.has(e.id) && e.t.getTime() >= t0 && (!F.unit || e.unit === +F.unit) && (opts.allKids || !F.kid || e.id === F.kid));
+}
+/* Tóm tắt từng bé: mục đã mở, thời gian, điểm theo trò */
+function summarize(evs) {
+  const by = {};
+  evs.forEach(e => {
+    const k = by[e.id] || (by[e.id] = { opened: {}, secs: 0, last: null, games: {}, videos: [], plays: 0 });
+    if (!k.last || e.t > k.last) k.last = e.t;
+    k.secs += e.secs;
+    if (e.unit && e.sec) {
+      const o = k.opened[e.unit] || (k.opened[e.unit] = {});
+      o[e.sec] = (o[e.sec] || 0) + 1;
+      if (e.secs) o["⏱" + e.sec] = (o["⏱" + e.sec] || 0) + e.secs;
+    }
+    if (e.type === "Điểm" && e.total) {
+      k.plays++;
+      const gk = e.unit + "|" + e.sec + "|" + e.game;
+      const g = k.games[gk] || (k.games[gk] = { unit: e.unit, sec: e.sec, game: e.game, n: 0, best: null, lastE: null });
+      g.n++;
+      if (!g.best || e.pct > g.best.pct) g.best = e;
+      if (!g.lastE || e.t > g.lastE.t) g.lastE = e;
+    }
+    if (e.type === "Video" || e.type === "Ghi âm") k.videos.push(e);
+  });
+  return by;
+}
+function avgBest(k, unit, sec) {
+  const gs = Object.values(k.games).filter(g => (!unit || g.unit === unit) && (!sec || g.sec === sec));
+  if (!gs.length) return null;
+  return gs.reduce((a, g) => a + g.best.pct, 0) / gs.length;
+}
+
+/* ---------- Vẽ ---------- */
+function render() {
+  saveView();
+  document.querySelectorAll("#tabs [data-t]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.t === TAB)));
+  renderKPIs();
+  ({ overview: renderOverview, kid: renderKid, games: renderGames, log: renderLog, students: renderStudents })[TAB]();
+}
+
+function renderKPIs() {
+  const evs = filtered(), kids = F.kid ? [ST[F.kid]] : kidsIn();
+  const sc = evs.filter(e => e.type === "Điểm" && e.total);
+  const act7 = new Set(EV.filter(e => e.t.getTime() >= Date.now() - 7 * 86400000).map(e => e.id));
+  const activeKids = kids.filter(k => k && act7.has(k.id)).length;
+  const secs = evs.reduce((a, e) => a + e.secs, 0);
+  const avg = sc.length ? sc.reduce((a, e) => a + e.pct, 0) / sc.length : null;
+  const vids = evs.filter(e => e.type === "Video").length;
+  const tiles = [
+    [F.kid ? esc(ST[F.kid].name) : kids.length, F.kid ? "Bé đang xem" : "Số bé" + (F.lop ? " trong lớp" : "")],
+    [activeKids + (F.kid ? "" : "/" + kids.length), "Bé có học trong 7 ngày qua"],
+    [sc.length, "Lượt chơi có điểm"],
+    [pctTxt(avg), "Điểm trung bình các lượt"],
+    [mins(secs), "Thời gian học"],
+    [vids, "Video Show and Tell / lồng tiếng"]
+  ];
+  $("#kpis").innerHTML = tiles.map(t => `<div class="kpi"><b class="num">${t[0]}</b><span>${t[1]}</span></div>`).join("");
+}
+
+function head(title, desc, extra = "") {
+  return `<div class="phead"><div><h2>${title}</h2>${desc ? `<p>${desc}</p>` : ""}</div><div style="display:flex;gap:8px;flex-wrap:wrap">${extra}</div></div>`;
+}
+const csvBtn = id => `<button class="btn" type="button" data-csv="${id}">Tải CSV</button>`;
+const lvl = f => f <= 0 ? "" : f < .34 ? "l1" : f < .67 ? "l2" : f < 1 ? "l3" : "l4";
+
+/* Tổng quan lớp */
+function renderOverview() {
+  const kids = kidsIn().filter(k => !F.kid || k.id === F.kid);
+  const by = summarize(filtered({ allKids: true }));
+  const units = F.unit ? [+F.unit] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  const single = !!F.unit;
+  const cols = single ? secsOf(F.unit) : units;
+  const legend = `<div class="legend"><span>Mục đã mở:</span><span><i style="background:var(--surface-2)"></i>chưa</span><span><i style="background:var(--s100)"></i>ít</span><span><i style="background:var(--s150)"></i>một nửa</span><span><i style="background:var(--s250)"></i>gần đủ</span><span><i style="background:var(--s450)"></i>đủ</span><span>· số % là điểm trung bình (lượt cao nhất mỗi trò)</span></div>`;
+  let html = head(single ? `Unit ${F.unit} · ${esc(UNITS[F.unit][1])}` : "Tổng quan lớp", (F.days ? `${F.days} ngày gần đây` : "Toàn bộ thời gian") + " · bấm vào ô để xem chi tiết bé", csvBtn("ov"));
+  if (!kids.length) { $("#panel").innerHTML = html + `<div class="empty">Chưa có bé nào trong bộ lọc này.</div>`; return; }
+  html += legend + `<div style="height:8px"></div><div class="tbl-wrap"><table id="ov"><thead><tr><th class="stick">Bé</th><th>Lớp</th>` +
+    cols.map(c => `<th class="c">${single ? esc(c) : "U" + c}</th>`).join("") + `<th class="r">Thời gian</th><th>Học gần nhất</th></tr></thead><tbody>`;
+  kids.forEach(k => {
+    const s = by[k.id];
+    html += `<tr><td class="stick"><button class="kid" data-kid="${esc(k.id)}">${esc(k.name)}</button></td><td>${esc(k.lop) || '<span class="sub">—</span>'}</td>`;
+    cols.forEach(c => {
+      const u = single ? +F.unit : c, op = (s && s.opened[u]) || {};
+      if (single) {
+        const on = !!op[c], p = s ? avgBest(s, u, c) : null, t = op["⏱" + c] || 0;
+        html += `<td class="c"><button class="cell ${on ? "l3" : ""}" data-kid="${esc(k.id)}" data-u="${u}" title="${esc(c)}">${on ? "✓" : "—"}<small>${p != null ? pctTxt(p) : t ? mins(t) : ""}</small></button></td>`;
+      } else {
+        const need = secsOf(u), n = need.filter(x => op[x]).length, p = s ? avgBest(s, u) : null;
+        html += `<td class="c"><button class="cell ${lvl(n / need.length)}" data-kid="${esc(k.id)}" data-u="${u}" title="Unit ${u}: ${n}/${need.length} mục${p != null ? ", điểm TB " + pctTxt(p) : ""}">${n ? n + "/" + need.length : "—"}<small>${p != null ? pctTxt(p) : ""}</small></button></td>`;
+      }
+    });
+    html += `<td class="r num">${s && s.secs ? mins(s.secs) : "—"}</td><td>${s ? fmtT(s.last) : '<span class="sub">chưa học</span>'}</td></tr>`;
+  });
+  html += `</tbody></table></div>`;
+  const evs = filtered();
+  html += `<div style="height:16px"></div><div class="card"><h3>Số phút học mỗi ngày (14 ngày gần nhất)</h3>${dayChart(evs)}</div>`;
+  $("#panel").innerHTML = html;
+}
+
+/* Biểu đồ cột: phút học theo ngày */
+function dayChart(evs) {
+  const days = [], now = Date.now();
+  for (let i = 13; i >= 0; i--) { const d = new Date(now - i * 86400000); days.push({ k: dayKey(d), d, v: 0, kids: new Set() }); }
+  const idx = Object.fromEntries(days.map((x, i) => [x.k, i]));
+  evs.forEach(e => { const i = idx[dayKey(e.t)]; if (i != null) { days[i].v += e.secs / 60; days[i].kids.add(e.id); } });
+  const W = 700, H = 190, L = 34, B = 26, T = 10, max = Math.max(5, ...days.map(x => x.v));
+  const step = max <= 10 ? 2 : max <= 30 ? 5 : max <= 60 ? 10 : max <= 150 ? 30 : 60, top = Math.ceil(max / step) * step;
+  const y = v => T + (H - T - B) * (1 - v / top), bw = (W - L) / days.length, w = Math.min(28, bw * .55);
+  let g = "";
+  for (let v = 0; v <= top; v += step) g += `<line class="grid" x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+  days.forEach((x, i) => {
+    const cx = L + bw * i + bw / 2, h = (H - T - B) - (y(x.v) - T), yy = y(x.v), r = Math.min(4, h);
+    const label = x.d.toLocaleDateString("vi-VN", { timeZone: TZ, day: "2-digit", month: "2-digit" });
+    const tip = `${label}: ${Math.round(x.v)} phút · ${x.kids.size} bé`;
+    g += `<g data-tip="${esc(tip)}"><rect class="hit" x="${cx - bw / 2}" y="${T}" width="${bw}" height="${H - T - B}"/>` +
+      (x.v > 0 ? `<path class="bar" d="M${cx - w / 2},${H - B} V${yy + r} Q${cx - w / 2},${yy} ${cx - w / 2 + r},${yy} H${cx + w / 2 - r} Q${cx + w / 2},${yy} ${cx + w / 2},${yy + r} V${H - B} Z"/>` : "") +
+      (i % 2 === 1 || days.length < 8 ? `<text class="ax" x="${cx}" y="${H - 8}" text-anchor="middle">${label}</text>` : "") + `</g>`;
+  });
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Số phút học mỗi ngày trong 14 ngày">${g}</svg><div class="tip" hidden></div></div>`;
+}
+document.addEventListener("mousemove", e => {
+  const g = e.target.closest && e.target.closest(".chart g[data-tip]");
+  document.querySelectorAll(".chart .tip").forEach(t => { if (!g || !t.parentNode.contains(g)) t.hidden = true; });
+  if (!g) return;
+  const box = g.closest(".chart"), tip = box.querySelector(".tip"), r = box.getBoundingClientRect(), b = g.getBoundingClientRect();
+  tip.textContent = g.dataset.tip; tip.hidden = false;
+  tip.style.left = Math.max(60, Math.min(r.width - 60, b.left - r.left + b.width / 2)) + "px";
+  tip.style.top = (box.querySelector("svg").getBoundingClientRect().top - r.top + 14) + "px";
+});
+
+/* Chi tiết từng bé */
+function renderKid() {
+  const kids = kidsIn();
+  if (!F.kid) {
+    $("#panel").innerHTML = head("Chi tiết từng bé", "Chọn một bé ở ô “Bé” phía trên, hoặc bấm tên bé dưới đây.") +
+      (kids.length ? `<div style="display:flex;flex-wrap:wrap;gap:8px">${kids.map(k => `<button class="btn" data-kid="${esc(k.id)}">${esc(k.name)}${k.lop ? ` <span class="sub">${esc(k.lop)}</span>` : ""}</button>`).join("")}</div>` : `<div class="empty">Chưa có bé nào.</div>`);
+    return;
+  }
+  const k = ST[F.kid], evs = filtered(), s = summarize(evs)[k.id];
+  const allTime = summarize(EV.filter(e => e.id === k.id))[k.id];
+  let html = head(esc(k.name), (F.days ? `${F.days} ngày gần đây` : "Toàn bộ thời gian") + (F.unit ? ` · Unit ${F.unit}` : ""), `<button class="btn" data-kid="">← Danh sách bé</button>`);
+  html += `<div class="kgrid"><div class="card"><h3>Thông tin</h3><dl class="facts">
+    <dt>Lớp</dt><dd>${esc(k.lop) || "Chưa xếp lớp"}</dd>
+    <dt>SĐT phụ huynh</dt><dd class="num">${esc(k.phone)}</dd>
+    <dt>Bắt đầu học</dt><dd>${fmtD(k.first)}</dd>
+    <dt>Học gần nhất</dt><dd>${fmtT(allTime ? allTime.last : k.last)}</dd>
+    <dt>Thời gian học</dt><dd>${s ? mins(s.secs) : "—"}</dd>
+    <dt>Lượt chơi có điểm</dt><dd>${s ? s.plays : 0}</dd>
+    <dt>Video / ghi âm</dt><dd>${s ? s.videos.length : 0}</dd></dl></div>
+    <div class="card"><h3>Số phút học mỗi ngày</h3>${dayChart(EV.filter(e => e.id === k.id))}</div></div>`;
+  if (!s) { $("#panel").innerHTML = html + `<div class="empty">Bé chưa có hoạt động trong khoảng thời gian này.</div>`; return; }
+  const units = F.unit ? [+F.unit] : Object.keys(s.opened).map(Number).sort((a, b) => a - b);
+  units.forEach((u, ui) => {
+    const op = s.opened[u] || {}, need = secsOf(u), n = need.filter(x => op[x]).length, p = avgBest(s, u);
+    html += `<details class="unitbox"${ui < 2 || F.unit ? " open" : ""}><summary><span class="u">Unit ${u}</span><span class="grow">${esc(UNITS[u][1])}</span>
+      <span class="tag">${n}/${need.length} mục</span>${p != null ? `<span class="sc ${band(p)}">${pctTxt(p)}</span>` : ""}</summary><div class="inner">`;
+    need.forEach(sec => {
+      const games = Object.values(s.games).filter(g => g.unit === u && g.sec === sec).sort((a, b) => a.game.localeCompare(b.game));
+      const vids = s.videos.filter(v => v.unit === u && v.sec === sec), t = op["⏱" + sec] || 0;
+      html += `<div class="secrow"><div class="secname">${op[sec] ? "✓ " : "— "}${esc(sec)}<span class="sub">${op[sec] ? (t ? mins(t) : "đã mở") : "chưa mở"}</span></div><div>`;
+      if (games.length) {
+        html += `<table class="mini"><thead><tr><th>Trò</th><th class="r">Lượt</th><th class="r">Gần nhất</th><th class="r">Cao nhất</th><th>Lần cuối</th></tr></thead><tbody>` +
+          games.map(g => `<tr><td>${esc(g.game)}${g.lastE.note ? ` <span class="sub">${esc(g.lastE.note)}</span>` : ""}</td><td class="r num">${g.n}</td>
+            <td class="r num"><span class="sc ${band(g.lastE.pct)}">${g.lastE.score}/${g.lastE.total}</span></td>
+            <td class="r num"><span class="sc ${band(g.best.pct)}">${g.best.score}/${g.best.total}</span></td><td>${fmtT(g.lastE.t)}</td></tr>`).join("") + `</tbody></table>`;
+      }
+      if (vids.length) html += `<div class="sub" style="margin-top:4px">${vids.map(v => `🎥 ${esc(v.game || v.type)} · ${v.secs} giây · ${fmtT(v.t)}`).join("<br>")}</div>`;
+      if (!games.length && !vids.length) html += `<span class="sub">${op[sec] ? "Chưa có điểm (bé mới mở, chưa chơi xong trò nào)" : ""}</span>`;
+      html += `</div></div>`;
+    });
+    html += `</div></details>`;
+  });
+  $("#panel").innerHTML = html;
+}
+
+/* Điểm theo trò */
+function renderGames() {
+  const evs = filtered().filter(e => e.type === "Điểm" && e.total);
+  const rows = {};
+  evs.forEach(e => {
+    const key = e.unit + "|" + e.sec + "|" + e.game;
+    const r = rows[key] || (rows[key] = { unit: e.unit, sec: e.sec, game: e.game, n: 0, sum: 0, kids: {} });
+    r.n++; r.sum += e.pct;
+    r.kids[e.id] = Math.max(r.kids[e.id] == null ? -1 : r.kids[e.id], e.pct);
+  });
+  const list = Object.values(rows).sort((a, b) => a.unit - b.unit || SECS.indexOf(a.sec) - SECS.indexOf(b.sec) || a.game.localeCompare(b.game));
+  let html = head("Điểm theo trò", "Mỗi dòng là một trò. “Cần luyện thêm” là bé có lượt cao nhất dưới 50%.", csvBtn("gm"));
+  if (!list.length) { $("#panel").innerHTML = html + `<div class="empty">Chưa có lượt chơi nào có điểm trong bộ lọc này.</div>`; return; }
+  html += `<div class="tbl-wrap"><table id="gm"><thead><tr><th>Unit</th><th>Mục</th><th>Trò</th><th class="r">Số bé</th><th class="r">Lượt</th><th class="r">Điểm TB mọi lượt</th><th class="r">TB lượt cao nhất</th><th>Cần luyện thêm</th></tr></thead><tbody>`;
+  list.forEach(r => {
+    const ks = Object.entries(r.kids), avg = r.sum / r.n, best = ks.reduce((a, x) => a + x[1], 0) / ks.length;
+    const weak = ks.filter(x => x[1] < 50).map(x => (ST[x[0]] || {}).name || x[0]);
+    html += `<tr><td>U${r.unit}</td><td>${esc(r.sec)}</td><td><b>${esc(r.game)}</b></td><td class="r num">${ks.length}</td><td class="r num">${r.n}</td>
+      <td class="r num"><span class="sc ${band(avg)}">${pctTxt(avg)}</span></td><td class="r num"><span class="sc ${band(best)}">${pctTxt(best)}</span></td>
+      <td style="white-space:normal;min-width:180px">${weak.length ? esc(weak.join(", ")) : '<span class="sub">—</span>'}</td></tr>`;
+  });
+  html += `</tbody></table></div><div style="height:8px"></div><div class="legend"><span class="sc good">Tốt: từ 80%</span><span class="sc warn">Khá: 50–79%</span><span class="sc crit">Cần luyện: dưới 50%</span></div>`;
+  $("#panel").innerHTML = html;
+}
+
+/* Nhật ký */
+function renderLog() {
+  const evs = filtered().slice().sort((a, b) => b.t - a.t);
+  const show = evs.slice(0, 500);
+  let html = head("Nhật ký hoạt động", `${evs.length} dòng${evs.length > 500 ? " · hiện 500 dòng mới nhất (tải CSV để lấy hết)" : ""}`, csvBtn("lg"));
+  if (!evs.length) { $("#panel").innerHTML = html + `<div class="empty">Chưa có hoạt động trong bộ lọc này.</div>`; return; }
+  html += `<div class="tbl-wrap"><table id="lg"><thead><tr><th>Thời gian</th><th>Bé</th><th>Unit</th><th>Mục</th><th>Loại</th><th>Trò / trang</th><th class="r">Kết quả</th><th>Ghi chú</th></tr></thead><tbody>` +
+    show.map(e => `<tr><td class="num">${fmtT(e.t)}</td><td><button class="kid" data-kid="${esc(e.id)}">${esc((ST[e.id] || e).name)}</button></td><td>${e.unit ? "U" + e.unit : ""}</td><td>${esc(e.sec)}</td>
+      <td><span class="tag">${esc(e.type)}</span></td><td style="max-width:280px;overflow:hidden;text-overflow:ellipsis">${esc(e.game)}</td>
+      <td class="r num">${e.type === "Điểm" ? `<span class="sc ${band(e.pct)}">${e.score}/${e.total}</span>` : e.secs ? mins(e.secs) : ""}</td><td class="sub">${esc(e.note)}</td></tr>`).join("") +
+    `</tbody></table></div>`;
+  $("#panel").innerHTML = html;
+  $("#panel")._all = evs;
+}
+
+/* Học sinh & lớp */
+function renderStudents() {
+  const kids = kidsIn(), cl = classes();
+  let html = head("Học sinh & lớp", "Bé tự có tên ở đây sau lần đăng nhập đầu tiên. Gõ tên lớp rồi bấm ra ngoài để lưu (lưu thẳng vào Google Sheet).", csvBtn("hs"));
+  if (!kids.length) { $("#panel").innerHTML = html + `<div class="empty">Chưa có bé nào.</div>`; return; }
+  html += `<datalist id="cls">${cl.map(c => `<option value="${esc(c)}">`).join("")}</datalist><div class="tbl-wrap"><table id="hs"><thead><tr><th>Bé</th><th>Lớp</th><th>SĐT phụ huynh</th><th>Bắt đầu</th><th>Học gần nhất</th><th>Mã bé</th></tr></thead><tbody>` +
+    kids.map(k => `<tr><td><button class="kid" data-kid="${esc(k.id)}">${esc(k.name)}</button></td>
+      <td><input class="lopin" list="cls" value="${esc(k.lop)}" data-id="${esc(k.id)}" aria-label="Lớp của ${esc(k.name)}"> <span class="saved" data-ok="${esc(k.id)}"></span></td>
+      <td class="num">${esc(k.phone)}</td><td>${fmtD(k.first)}</td><td>${fmtT(k.last)}</td><td class="sub">${esc(k.id)}</td></tr>`).join("") + `</tbody></table></div>`;
+  $("#panel").innerHTML = html;
+}
+document.addEventListener("change", e => {
+  const inp = e.target.closest && e.target.closest(".lopin"); if (!inp) return;
+  const id = inp.dataset.id, lop = inp.value.trim(), ok = document.querySelector(`[data-ok="${CSS.escape(id)}"]`);
+  ok.textContent = "Đang lưu…"; ok.style.color = "";
+  const done = () => { ST[id].lop = lop; ok.textContent = "Đã lưu ✓"; fillFilters(); renderKPIs(); };
+  if (DEMO) { done(); return; }
+  LC.post({ action: "setClass", key: KEY, id, lop }, 15000)
+    .then(j => { if (!j.ok) throw new Error(j.error); done(); })
+    .catch(x => { ok.textContent = "Chưa lưu được"; ok.style.color = "var(--crit)"; });
+});
+
+/* Bấm tên bé, ô tiến độ, tải CSV */
+document.addEventListener("click", e => {
+  const k = e.target.closest && e.target.closest("[data-kid]");
+  if (k) {
+    F.kid = k.dataset.kid; TAB = "kid";
+    fillFilters(); render(); window.scrollTo({ top: $("#tabs").offsetTop - 80, behavior: "smooth" });
+    if (k.dataset.u) setTimeout(() => { const d = [...document.querySelectorAll(".unitbox")].find(x => x.querySelector(".u").textContent === "Unit " + k.dataset.u); if (d) { d.open = true; d.scrollIntoView({ block: "start", behavior: "smooth" }); } }, 60);
+    return;
+  }
+  const c = e.target.closest && e.target.closest("[data-csv]");
+  if (c) downloadCSV(c.dataset.csv);
+});
+function downloadCSV(id) {
+  let rows = [];
+  if (id === "lg") {
+    rows.push(["Thời gian", "Mã bé", "Tên bé", "Lớp", "Unit", "Mục", "Loại", "Trò", "Điểm", "Tổng", "%", "Giây", "Ghi chú"]);
+    ($("#panel")._all || []).forEach(e => rows.push([fmtT(e.t), e.id, (ST[e.id] || e).name, (ST[e.id] || {}).lop || "", e.unit, e.sec, e.type, e.game, e.score ?? "", e.total ?? "", e.pct ?? "", e.secs || "", e.note]));
+  } else {
+    const t = document.getElementById(id); if (!t) return;
+    t.querySelectorAll("tr").forEach(tr => rows.push([...tr.children].map(td => { const i = td.querySelector("input"); return (i ? i.value : td.innerText).replace(/\s+/g, " ").trim(); })));
+  }
+  const csv = "﻿" + rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  a.download = ({ ov: "tong-quan", gm: "diem-theo-tro", lg: "nhat-ky", hs: "hoc-sinh" }[id] || id) + "-" + dayKey(new Date()) + ".csv";
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+
+/* ---------- Dữ liệu mẫu ---------- */
+function demoData() {
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const names = [["Nguyễn Minh An", "Seed A"], ["Trần Bảo Ngọc", "Seed A"], ["Lê Gia Huy", "Seed A"], ["Phạm Khánh Linh", "Seed A"], ["Đỗ Đức Minh", "Seed A"],
+    ["Vũ Hà My", "Seed B"], ["Hoàng Tuấn Kiệt", "Seed B"], ["Bùi Thảo Vy", "Seed B"], ["Ngô Quốc Bảo", "Seed B"], ["Đặng Tú Anh", ""]];
+  const GAMES = { "Vocab Bài 1": ["Flying Fruits", "Matching Tiles", "Kéo co"], "Vocab Bài 2": ["Whack-a-mole", "Matching Tiles", "Duck Race"], "Story": ["Quiz: My Story"], "Practice": ["Trò 1", "Trò 2", "Trò 3"], "Warm-up": ["Hát khởi động"] };
+  const TOT = { "Flying Fruits": 10, "Matching Tiles": 6, "Kéo co": 5, "Whack-a-mole": 10, "Duck Race": 6, "Quiz: My Story": 5, "Trò 1": 8, "Trò 2": 6, "Trò 3": 6, "Hát khởi động": 5 };
+  const students = [], events = [], now = Date.now();
+  names.forEach(([n, lop], i) => {
+    const phone = "09" + String(12345670 + i * 7919).slice(0, 8), id = phone + "-" + LC.slug(n);
+    const skill = .45 + rnd() * .5, reach = 2 + Math.floor(rnd() * 8);
+    students.push({ id, name: n, phone, lop, note: "", first: new Date(now - 26 * 86400000).toISOString(), last: "" });
+    let day = 25;
+    for (let u = 1; u <= reach; u++) {
+      day = Math.max(0, day - (1 + Math.floor(rnd() * 3)));
+      secsOf(u).forEach(sec => {
+        if (rnd() < .12) return;
+        const t = now - day * 86400000 - Math.floor(rnd() * 8) * 3600000, secs = 60 + Math.floor(rnd() * 600);
+        events.push([new Date(t).toISOString(), id, n, u, sec, "Mở bài", "Unit " + u, "", "", "", secs, ""]);
+        (GAMES[sec === "Practice" ? "Practice" : sec] || []).forEach((g, gi) => {
+          const tries = 1 + Math.floor(rnd() * 2);
+          for (let k = 0; k < tries; k++) {
+            if (rnd() < .2) continue;
+            const tot = TOT[g], sc = Math.max(0, Math.min(tot, Math.round(tot * (skill + (rnd() - .5) * .5 + k * .1))));
+            events.push([new Date(t + (gi * 3 + k + 1) * 60000).toISOString(), id, n, u, sec, "Điểm", g, sc, tot, Math.round(sc / tot * 100), "", ""]);
+          }
+        });
+        if (sec === "Show and Tell" && rnd() < .7) events.push([new Date(t + 300000).toISOString(), id, n, u, sec, "Video", "Show and Tell", "", "", "", 40 + Math.floor(rnd() * 60), ""]);
+      });
+    }
+  });
+  events.sort((a, b) => a[0] < b[0] ? -1 : 1);
+  return { ok: true, students, classes: ["Seed A", "Seed B"], events, time: new Date().toISOString() };
+}
+</script>
+</body>
+</html>

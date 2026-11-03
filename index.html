@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="vi">
 <head>
+<script src="assets/lc-track.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Lingo Cub · Little Seed</title>
@@ -114,6 +115,7 @@ a:focus-visible,button:focus-visible{outline:4px solid var(--sun);outline-offset
 .unit .prog i.na{opacity:.5;border-style:dashed}
 .u1,.u5,.u9{--c:var(--c1)}.u2,.u6,.u10{--c:var(--c2)}.u3,.u7,.u11{--c:var(--c3)}.u4,.u8,.u12{--c:var(--c4)}
 .sec-title{margin:6px 0 -6px;font-family:var(--f-display);font-weight:800;font-size:22px}
+.lc-teacher{font-size:12px;font-weight:800;color:inherit;opacity:.7;margin-left:10px}
 </style>
 </head>
 <body>
@@ -210,18 +212,23 @@ a:focus-visible,button:focus-visible{outline:4px solid var(--sun);outline-offset
     </a>
   </section>
 
-  <footer class="foot"><span>Lingo Cub · Little Seed · Mục đã mở có màu (lưu trên máy này)</span></footer>
+  <footer class="foot"><span>Lingo Cub · Little Seed · Mục đã học có màu (theo từng bé)</span><a class="lc-teacher" href="giao-vien/">Trang giáo viên</a></footer>
 </main>
 <script>
+function paintUnits(){ /*LC*/
 document.querySelectorAll(".unit").forEach(a => {
   let d = {};
-  try{ d = JSON.parse(localStorage.getItem("lingocub-unit" + a.dataset.u + "-done")) || {}; }catch(e){}
+  const key = window.LC ? LC.doneKey(a.dataset.u) : "lingocub-unit" + a.dataset.u + "-done";
+  try{ d = JSON.parse(localStorage.getItem(key)) || {}; }catch(e){}
   const on = { wu: d["warm-up"], vo: d["vocab-1"] || d["vocab-2"], st: d["story"], pr: d["practice"] || d["sat"] };
   a.querySelectorAll(".prog i").forEach(i => {
     i.classList.toggle("on", !!on[i.dataset.p]);
     if(i.dataset.p === "wu" && a.dataset.wu === "0") i.classList.add("na");
   });
 });
+}
+paintUnits();
+window.addEventListener("lc-progress", paintUnits);
 </script>
 </body>
 </html>

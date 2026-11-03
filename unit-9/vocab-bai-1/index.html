@@ -1,4 +1,5 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head>
+<script src="../../assets/lc-track.js"></script><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!doctype html>
 <html lang="vi">
 <head>
@@ -1271,7 +1272,7 @@ const Fruits = (() => {
       setTimeout(sayPrompt, 450);
     }
   }
-  function finish(){
+  function finish(){window.LC&&LC.score('Flying Fruits',got,ROUNDS);/*LC*/
     fruits.forEach(f => f.el.remove()); fruits = [];
     sky.hidden = true;
     const end = $('#frEnd'); end.hidden = false;
@@ -1344,7 +1345,7 @@ const Fruits = (() => {
       if (found === N) finish(); else fb('Lật tiếp 2 thẻ nhé.');
     }, match ? 1300 : 2100);
   }
-  function finish(){
+  function finish(){window.LC&&LC.score('Matching Tiles',Math.round(N*right/Math.max(1,tries)),N,'Chọn đúng '+right+'/'+tries+' lần');/*LC*/
     $('#mtPlay').hidden = true;
     const end = $('#mtEnd'); end.hidden = false;
     const score = Math.round(N * right / Math.max(1, tries));
@@ -1469,7 +1470,7 @@ const Quiz = (() => {
     setTimeout(() => { const a = q.ans || q.w; q.dir==='en2zh' ? sayZh(a) : sayEn(a); }, 450);
     setTimeout(() => { qi++; qi < qs.length ? show() : finish(); }, q.yn ? 3000 : 3400);
   }
-  function finish(){
+  function finish(){window.LC&&LC.score('Head-tilt Quiz',score,6);/*LC*/
     $('#qzPlay').hidden = true;
     const end = $('#qzEnd'); end.hidden = false;
     end.innerHTML = `<h2>${score>=5?'Excellent! 太棒了！':score>=3?'Good job! 很好！':'Keep going! 加油！'}</h2><p>Đúng <b>${score}/6</b> câu</p><div class="big-stars">${starsHTML(score,6)}</div><div class="row" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><button class="btn" id="qzAgain">Chơi lại</button><button class="btn ghost" id="qzBack">Đổi cách chơi</button></div>`;
@@ -1673,7 +1674,7 @@ const Whack = (() => {
     h.btn.addEventListener('pointerdown', e => { e.preventDefault(); hit(h); });
     h.btn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); hit(h); } });
   });
-  function finish(){
+  function finish(){window.LC&&LC.score('Whack-a-mole',got,ROUNDS);/*LC*/
     field.hidden = true;
     const end = $('#wmEnd'); end.hidden = false;
     end.innerHTML = `<h2>${got>=8?'Excellent! 太棒了！':got>=5?'Good job! 很好！':'Keep going! 加油！'}</h2><p>Đập đúng ngay lần đầu <b>${got}/${ROUNDS}</b> chú chuột</p><div class="big-stars">${starsHTML(got,ROUNDS)}</div><button class="btn" id="wmAgain">Chơi lại</button>`;
@@ -1776,7 +1777,7 @@ const Tug = (() => {
       if (!sec.hidden) q.dir === 'en2zh' ? sayZh(q.w) : sayEn(q.w);
     });
   }
-  function finish(win){
+  function finish(win){window.LC&&LC.score('Kéo co',(win?lives:0),LIVES,win?'Thắng, còn '+lives+' tim':'Thua');/*LC*/
     $('#tgQ').hidden = true;
     if (win){ mon.classList.add('ko','fall'); kid.classList.add('jump'); FX.hammer(); setTimeout(FX.dizzy, 200); setTimeout(FX.whistle, 900); }
     else { kid.classList.add('fall'); mon.classList.add('jump'); }
@@ -1874,7 +1875,7 @@ const Maze = (() => {
     if (lives <= 0){ state = 'over'; setTimeout(() => finish(false), 700); return; }
     inv = 1600;
   }
-  function finish(done){
+  function finish(done){window.LC&&LC.score('Maze Chase',score,QN,done?'':'Hết tim');/*LC*/
     state = 'over'; cancelAnimationFrame(raf); raf = 0; $('#mzNext').hidden = true;
     const end = $('#mzEnd'); end.hidden = false;
     end.innerHTML = done
@@ -2066,7 +2067,7 @@ const Face = (() => {
       if (tile){ tile.classList.remove('bad'); void tile.offsetWidth; tile.classList.add('bad'); }
     }
   }
-  function finish(){
+  function finish(){window.LC&&LC.score('Feelings Face',score,N);/*LC*/
     sec.querySelector('.fa-stage').hidden = true; const end = $('#faEnd'); end.hidden = false;
     end.innerHTML = `<h2>${score >= 7 ? 'Excellent! 太棒了！' : score >= 5 ? 'Good job! 很好！' : 'Keep going! 加油！'}</h2><p>Đúng ngay lần đầu <b>${score}/${N}</b> câu</p><div class="big-stars">${starsHTML(Math.round(score / N * 5), 5)}</div><button class="btn" id="faAgain">Chơi lại</button>`;
     $('#faAgain').onclick = start;
@@ -2210,7 +2211,7 @@ const Duck = (() => {
     else { p.stun = 2.4; }
     state = 'race'; $('#dkSwim').disabled = false; loop();
   }
-  function finish(won){
+  function finish(won){window.LC&&LC.score('Duck Race',right,NQ,won?'':'Vịt bị choáng');/*LC*/
     state = 'over'; cancelAnimationFrame(raf); raf = 0; $('#dkSwim').disabled = true; $('#dkSwim').hidden = true;
     const order = racers.slice().sort((a, b) => (b.fin ? 1e9 - b.fin : b.x) - (a.fin ? 1e9 - a.fin : a.x)), place = order.indexOf(P()) + 1;
     const end = $('#dkEnd'); end.hidden = false;
@@ -2386,7 +2387,7 @@ const Pick = (() => {
       $('#pkMsg').innerHTML = NEAR[q.d] ? 'Chưa đúng! <b>this / these</b> (这 / 这些) là đồ ở <b>gần</b> bạn ấy.' : 'Chưa đúng! <b>that / those</b> (那 / 那些) là đồ ở <b>xa</b> bạn ấy.';
     }
   }
-  function finish(){
+  function finish(){window.LC&&LC.score('This or That?',score,N);/*LC*/
     $('#pkScene').hidden = true; const end = $('#pkEnd'); end.hidden = false;
     end.innerHTML = `<h2>${score >= 11 ? 'Excellent! 太棒了！' : score >= 8 ? 'Good job! 很好！' : 'Keep going! 加油！'}</h2><p>Đúng ngay lần đầu <b>${score}/${N}</b> câu</p><div class="big-stars">${starsHTML(Math.round(score / N * 5), 5)}</div><button class="btn" id="pkAgain">Chơi lại</button>`;
     $('#pkAgain').onclick = start;
@@ -2461,7 +2462,7 @@ const Runner = (() => {
       if (AUD) setTimeout(() => { if (state === 'back') sayQ(); }, 500); else setTimeout(() => { if (state === 'stuck') sayQ(); }, 700);          // hear it again and choose again
     }
   }
-  function finish(done){
+  function finish(done){window.LC&&LC.score('Picture Dash',score,QN,done?'':'Hết tim');/*LC*/
     state = 'over';
     const end = $('#rnEnd'); end.hidden = false;
     end.innerHTML = done
@@ -2681,7 +2682,7 @@ const Unjumble = (() => {
     $('#ujSlots').classList.remove('win'); $('#ujDone').hidden = true; $('#ujNext').hidden = true;
     header(); slots(); spawn();
   }
-  function finish(){
+  function finish(){window.LC&&LC.score('Unjumble',got,N);/*LC*/
     $('#ujPlay').hidden = true;
     const end = $('#ujEnd'); end.hidden = false;
     end.innerHTML = `<h2>${got>=N-1?'Excellent! 太棒了！':got>=N/2?'Good job! 很好！':'Keep going! 加油！'}</h2><p>Bắt đúng ngay lần đầu <b>${got}/${N}</b> câu</p><div class="big-stars">${starsHTML(got,N)}</div><button class="btn" id="ujAgain">Chơi lại</button>`;
@@ -2795,7 +2796,7 @@ const OpenBox = (() => {
     $('#obRound').textContent = `${Math.min(round + 1, N)}/${N}`;
     if (round >= N) finish();
   }
-  function finish(){
+  function finish(){window.LC&&LC.score('Open the Box',got,N);/*LC*/
     started = false; sky.hidden = true;
     const end = $('#obEnd'); end.hidden = false;
     end.innerHTML = `<h2>${got>=N-1?'Excellent! 太棒了！':got>=N/2?'Good job! 很好！':'Keep going! 加油！'}</h2><p>Trả lời đúng ngay lần đầu <b>${got}/${N}</b> hộp quà</p><div class="big-stars">${starsHTML(got,N)}</div><button class="btn" id="obAgain">Chơi lại</button>`;
