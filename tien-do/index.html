@@ -76,6 +76,7 @@ function load(){
   if(!API){$("#body").innerHTML='<div class="note">Web chưa nối Google Sheet.</div>';return}
   fetch(API+"?action=kid&id="+encodeURIComponent(u.id)).then(r=>r.json()).then(j=>{
     if(!j.ok)throw new Error(j.error||"lỗi");
+    if(!Array.isArray(j.events))throw new Error("máy chủ Google Sheet chưa được cập nhật bản mới");
     draw(j,u);
   }).catch(e=>{$("#meta").textContent="";$("#body").innerHTML='<div class="note">Chưa tải được tiến độ ('+esc(e.message)+'). Bố mẹ kiểm tra mạng rồi bấm "Tải lại" nhé.</div>'});
 }
