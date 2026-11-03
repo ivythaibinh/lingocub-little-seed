@@ -1,0 +1,496 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Show and Tell Unit 7</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: a TV-studio stage (camera) on the left, a "script" rail of learned sentences on the right; stacks on phones */
+:root{
+  --bg:#EAF4EF; --surface:#FFFFFF; --ink:#1D2B36; --muted:#5A6B76; --line:#D3E3DB;
+  --stage:#163039; --stage-ink:#F3FAF6; --rec:#F2553D; --sun:#FFC83A; --leaf:#2F9E7A; --chip:#F2F8F5;
+  --display:"Baloo 2","Nunito",system-ui,sans-serif;
+  --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --zh:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E191C; --surface:#162428; --ink:#E8F1ED; --muted:#9DB0A9; --line:#263A3F;
+  --stage:#0A1518; --stage-ink:#F3FAF6; --rec:#FF6A52; --sun:#FFD15C; --leaf:#4CC29B; --chip:#1C2D32; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E191C; --surface:#162428; --ink:#E8F1ED; --muted:#9DB0A9; --line:#263A3F;
+  --stage:#0A1518; --stage-ink:#F3FAF6; --rec:#FF6A52; --sun:#FFD15C; --leaf:#4CC29B; --chip:#1C2D32; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto;padding-block:18px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-bottom:18px}
+.brand{display:flex;flex-direction:column;gap:2px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--leaf)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,4vw,38px);line-height:1.05;margin:0;text-wrap:balance}
+h1 span{color:var(--rec)}
+.tabs{display:inline-flex;background:var(--surface);border:3px solid var(--line);border-radius:999px;padding:5px;gap:6px;max-width:100%}
+.tab{font:800 clamp(18px,2.6vw,22px)/1 var(--display);border:0;background:transparent;color:var(--muted);padding:14px clamp(22px,4vw,38px);border-radius:999px;cursor:pointer}
+.tab:not([aria-selected="true"]):hover{background:var(--chip);color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--sun);color:#1D2B36;box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.tab:disabled{opacity:.5;cursor:not-allowed}
+.tab:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Stage */
+.stage{background:var(--stage);border-radius:22px;padding:12px;color:var(--stage-ink);min-width:0}
+.screen{position:relative;width:100%;aspect-ratio:4/3;max-width:100%;border-radius:14px;overflow:hidden;background:#000}
+.screen canvas,.screen video.play{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+.idle{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:20px;
+  background:radial-gradient(ellipse at 50% 38%,rgba(255,200,58,.22),transparent 60%),#0C1E24}
+.idle .big{font-family:var(--display);font-size:clamp(22px,3.4vw,30px);font-weight:800;line-height:1.1}
+.idle p{margin:0;color:#B8CBC4;max-width:40ch;font-size:15px}
+.err{color:#FFD7CF!important;font-weight:700}
+.count{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:min(30vw,180px);color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.5);pointer-events:none}
+.rec-badge{position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.55);padding:6px 12px;border-radius:999px;font-weight:800;font-variant-numeric:tabular-nums}
+.rec-badge i{width:12px;height:12px;border-radius:50%;background:var(--rec);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.25}}
+.status{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.55);padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.cue{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);max-width:calc(100% - 28px);background:rgba(255,255,255,.94);color:#1D2B36;
+  border-radius:16px;padding:8px 18px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.3);pointer-events:none}
+.cue b{display:block;font-family:var(--display);font-size:clamp(20px,3vw,28px);line-height:1.15}
+.cue b.zh{font-family:var(--zh);font-weight:700}
+.cue small{display:block;font-size:14px;color:#46606B;font-weight:700}
+
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 2px 4px}
+.btn{font:800 16px/1 var(--body);border:0;border-radius:999px;padding:13px 20px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;background:#2A4A54;color:var(--stage-ink)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--sun);color:#1D2B36}
+.btn.rec{background:var(--rec);color:#fff}
+.btn.rec .dot{width:14px;height:14px;border-radius:50%;background:#fff}
+.btn.stop .sq{width:13px;height:13px;border-radius:3px;background:currentColor}
+.spacer{flex:1}
+.opt{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:#B8CBC4}
+.opt input[type=text]{font:700 15px var(--body);border:2px solid #2A4A54;background:#0F252C;color:#fff;border-radius:10px;padding:8px 10px;width:150px}
+.opt input[type=checkbox]{width:18px;height:18px;accent-color:var(--sun)}
+
+.filters{border-top:1px solid rgba(255,255,255,.1);margin-top:8px;padding:12px 2px 2px}
+.filters h3{margin:0 0 8px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#9FC0B4}
+.frow{display:flex;flex-wrap:wrap;gap:8px}
+.fbtn{border:2px solid transparent;background:#0F252C;color:#fff;border-radius:16px;padding:6px 10px 6px 6px;cursor:pointer;display:flex;align-items:center;gap:8px;font:800 14px var(--body)}
+.fbtn canvas{width:40px;height:40px;border-radius:12px;background:#21414A}
+.fbtn[aria-pressed="true"]{border-color:var(--sun);background:#21414A}
+.note{font-size:13px;color:#9FC0B4;margin:10px 2px 0}
+
+/* Script rail */
+aside{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:18px;min-width:0}
+aside h2{font-family:var(--display);font-size:22px;margin:0 0 2px}
+aside .hint{margin:0 0 14px;color:var(--muted);font-size:14px}
+.step{margin:0 0 14px}
+.step h3{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.step h3 em{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--leaf);color:#fff;display:inline-grid;place-items:center;font-size:12px;letter-spacing:0}
+.line{width:100%;text-align:left;display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;align-items:center;background:var(--chip);border:2px solid transparent;border-radius:14px;padding:8px 10px;margin:0 0 6px;cursor:pointer;color:var(--ink);font:inherit}
+.line:hover{border-color:var(--line)}
+.line[aria-pressed="true"]{border-color:var(--sun);background:var(--surface)}
+.line .ic{font-size:26px;line-height:1;text-align:center}
+.line .t{font-weight:800;font-size:17px;line-height:1.2}
+.line .t.zh{font-family:var(--zh);font-size:19px;font-weight:700}
+.line .py{display:block;font-size:13px;color:var(--leaf);font-weight:700}
+.line .vi{display:block;font-size:13px;color:var(--muted)}
+.words{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.w{background:var(--chip);border-radius:999px;padding:4px 10px;font-size:13px;font-weight:700;color:var(--ink)}
+.w.zh{font-family:var(--zh)}
+.prep{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}
+.thing{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--chip);border:2px solid transparent;border-radius:14px;padding:8px 4px;cursor:pointer;color:var(--ink);font:700 13px var(--body);text-align:center}
+.thing .ic{font-size:26px;line-height:30px;height:30px}
+.thing .nm.zh{font-family:var(--zh);font-size:14px}
+.thing .tick{position:absolute;top:4px;right:6px;width:20px;height:20px;border-radius:50%;background:var(--leaf);color:#fff;font-size:12px;display:grid;place-items:center;opacity:0}
+.thing[aria-pressed="true"]{border-color:var(--leaf);background:var(--surface)}
+.thing[aria-pressed="true"] .tick{opacity:1}
+.mini{margin:6px 0 0;font-size:12px;color:var(--muted)}
+.line .ic svg,.thing .ic svg{vertical-align:middle}
+@media (prefers-reduced-motion:reduce){.rec-badge i{animation:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <span class="eyebrow">Lingo Cub · Little Seed · Unit 7</span>
+      <h1>Show and Tell: <span id="h1sub">My House</span></h1>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Ngôn ngữ">
+      <button class="tab" role="tab" id="tab-en" aria-selected="true" data-lang="en">Tiếng Anh</button>
+      <button class="tab" role="tab" id="tab-zh" aria-selected="false" data-lang="zh">Tiếng Trung</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="stage" aria-label="Quay video">
+      <div class="screen" id="screen">
+        <canvas id="cv" hidden></canvas>
+        <video id="play" class="play" controls playsinline hidden></video>
+        <div class="idle" id="idle">
+          <div class="big" id="idleTitle">Con sẵn sàng chưa?</div>
+          <p id="idleText">Con sẽ đi quanh phòng và giới thiệu đồ vật. Nhờ bố mẹ cầm máy giúp, hoặc bấm “Camera sau” để quay đồ vật. Bấm “Bật camera”, cho phép camera và micro, rồi bấm Quay.</p>
+          <button class="btn primary" id="btnCam">📷 Bật camera</button>
+        </div>
+        <div class="count" id="count" hidden></div>
+        <div class="rec-badge" id="recBadge" hidden><i></i><span id="recTime">0:00</span></div>
+        <div class="status" id="status" hidden></div>
+        <div class="cue" id="cue" hidden></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn rec" id="btnRec" disabled><span class="dot"></span>Quay</button>
+        <button class="btn stop" id="btnStop" hidden><span class="sq"></span>Dừng</button>
+        <button class="btn" id="btnRetake" hidden>↺ Quay lại</button>
+        <button class="btn primary" id="btnSave" hidden>⬇ Lưu video</button>
+        <button class="btn" id="btnFlip" hidden>🔄 Camera sau</button>
+        <span class="spacer"></span>
+        <label class="opt" for="kidName">Tên bé <input type="text" id="kidName" maxlength="20" placeholder="vd: Anna"></label>
+        <label class="opt" for="mirror"><input type="checkbox" id="mirror" checked> Soi gương</label>
+      </div>
+
+      <div class="filters">
+        <h3>Filter con vật (tuỳ chọn)</h3>
+        <div class="frow" id="frow"></div>
+        <p class="note" id="fnote">Filter đi theo khuôn mặt bé và được ghi vào video.</p>
+      </div>
+    </section>
+
+    <aside aria-label="Mẫu câu gợi ý">
+      <h2 id="railTitle">Câu gợi ý</h2>
+      <p class="hint">Chạm vào câu để hiện nhắc lời trên màn hình (chữ nhắc không bị ghi vào video).</p>
+      <div id="rail"></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+
+/* ---------- Sentences (Unit 1, 2, 6 + Unit 7 syllabus) ---------- */
+const SVG_TABLE='<svg viewBox="0 0 40 40" width="30" height="30"><rect x="4" y="12" width="32" height="6" rx="2" fill="#C98D59" stroke="#3B2A22" stroke-width="2"/><path d="M9 18v14M31 18v14" stroke="#3B2A22" stroke-width="3" stroke-linecap="round"/></svg>';
+const THINGS={
+  en:[[SVG_TABLE,"table"],["🪑","chair"],["🛏️","bed"],["🛋️","sofa"]],
+  zh:[[SVG_TABLE,"桌子 zhuōzi"],["🪑","椅子 yǐzi"],["🛏️","床 chuáng"],["🛋️","沙发 shāfā"]]
+};
+const SCRIPT={
+  en:[
+    {h:"Chào mọi người",items:[
+      {ic:"👋",t:"Hello everyone!",vi:"Xin chào mọi người"},
+      {ic:"😊",t:"My name is …",vi:"Con tên là …"},
+      {ic:"🎂",t:"I'm … years old.",vi:"Con … tuổi"}]},
+    {h:"Đi quanh phòng, chỉ vào từng đồ vật",items:[
+      {ic:SVG_TABLE,t:"This is my table.",vi:"Đây là cái bàn của con"},
+      {ic:"🪑",t:"This is my chair.",vi:"Đây là cái ghế của con"},
+      {ic:"🛏️",t:"This is my bed.",vi:"Đây là cái giường của con"},
+      {ic:"🛋️",t:"This is my sofa.",vi:"Đây là cái ghế sofa của con"}]},
+    {h:"Đặt đồ dùng lên trên / xuống dưới",items:[
+      {ic:"📕",t:"The book is on the table.",vi:"Quyển sách ở trên bàn"},
+      {ic:"🖊️",t:"The pen is on the bed.",vi:"Cái bút ở trên giường"},
+      {ic:"🎒",t:"The schoolbag is under the chair.",vi:"Cặp sách ở dưới ghế"},
+      {ic:"📏",t:"The ruler is under the sofa.",vi:"Cái thước ở dưới ghế sofa"}]},
+    {h:"Kết thúc",items:[
+      {ic:"🤝",t:"Nice to meet you!",vi:"Rất vui được gặp mọi người"},
+      {ic:"👋",t:"Goodbye!",vi:"Tạm biệt"}]}
+  ],
+  zh:[
+    {h:"Chào mọi người",items:[
+      {ic:"👋",t:"大家好！",py:"Dàjiā hǎo!",vi:"Xin chào mọi người"},
+      {ic:"😊",t:"我叫……。",py:"Wǒ jiào …",vi:"Con tên là …"},
+      {ic:"🎂",t:"我……岁。",py:"Wǒ … suì.",vi:"Con … tuổi"}]},
+    {h:"Đi quanh phòng, chỉ vào từng đồ vật",items:[
+      {ic:SVG_TABLE,t:"这是我的桌子。",py:"Zhè shì wǒ de zhuōzi.",vi:"Đây là cái bàn của con"},
+      {ic:"🪑",t:"这是我的椅子。",py:"Zhè shì wǒ de yǐzi.",vi:"Đây là cái ghế của con"},
+      {ic:"🛏️",t:"这是我的床。",py:"Zhè shì wǒ de chuáng.",vi:"Đây là cái giường của con"},
+      {ic:"🛋️",t:"这是我的沙发。",py:"Zhè shì wǒ de shāfā.",vi:"Đây là cái ghế sofa của con"}]},
+    {h:"Đặt đồ dùng lên trên / xuống dưới",items:[
+      {ic:"📕",t:"书在桌子上。",py:"Shū zài zhuōzi shàng.",vi:"Quyển sách ở trên bàn"},
+      {ic:"🖊️",t:"笔在床上。",py:"Bǐ zài chuáng shàng.",vi:"Cái bút ở trên giường"},
+      {ic:"🎒",t:"书包在椅子下。",py:"Shūbāo zài yǐzi xià.",vi:"Cặp sách ở dưới ghế"},
+      {ic:"📏",t:"尺子在沙发下。",py:"Chǐzi zài shāfā xià.",vi:"Cái thước ở dưới ghế sofa"}]},
+    {h:"Kết thúc",items:[
+      {ic:"🤝",t:"很高兴认识你！",py:"Hěn gāoxìng rènshi nǐ!",vi:"Rất vui được gặp bạn"},
+      {ic:"👋",t:"再见！",py:"Zàijiàn!",vi:"Tạm biệt"}]}
+  ]
+};
+let lang="en", cueKey=null, ready=new Set();
+try{JSON.parse(localStorage.getItem("u7st-ready")||"[]").forEach(x=>ready.add(x))}catch(e){}
+
+function renderRail(){
+  const rail=$("rail"); rail.innerHTML="";
+  $("railTitle").textContent= lang==="en"?"Câu gợi ý · Tiếng Anh":"Câu gợi ý · Tiếng Trung";
+  $("h1sub").textContent= lang==="en"?"My House":"这是我的床";
+  /* Step 1: get the things ready */
+  const p=document.createElement("div"); p.className="step";
+  const ph=document.createElement("h3"); ph.innerHTML="<em>1</em>"; ph.append("Tìm đồ vật trong phòng"); p.append(ph);
+  const g=document.createElement("div"); g.className="prep";
+  THINGS[lang].forEach(([ic,w])=>{
+    const k=w.split(" ")[0], b=document.createElement("button"); b.type="button"; b.className="thing"; b.setAttribute("aria-pressed",String(ready.has(k)));
+    b.innerHTML=`<span class="ic" aria-hidden="true">${ic}</span><span class="nm ${lang}"></span><span class="tick" aria-hidden="true">✓</span>`;
+    b.querySelector(".nm").textContent=w;
+    b.onclick=()=>{ready.has(k)?ready.delete(k):ready.add(k); try{localStorage.setItem("u7st-ready",JSON.stringify([...ready]))}catch(e){} renderRail();};
+    g.append(b);
+  });
+  p.append(g);
+  const pn=document.createElement("p"); pn.className="mini"; pn.textContent="Tìm thấy đồ vật nào thì chạm để đánh dấu ✓. Mang theo quyển sách, cái bút, cặp sách, cái thước để đặt lên trên hoặc xuống dưới đồ vật."; p.append(pn);
+  rail.append(p);
+  SCRIPT[lang].forEach((sec,si)=>{
+    const d=document.createElement("div"); d.className="step";
+    const h=document.createElement("h3"); h.innerHTML=`<em>${si+2}</em>`; h.append(sec.h); d.append(h);
+    sec.items.forEach((it,ii)=>{
+      const key=`${si}-${ii}`;
+      const b=document.createElement("button"); b.type="button"; b.className="line"; b.setAttribute("aria-pressed",String(cueKey===key));
+      b.innerHTML=`<span class="ic" aria-hidden="true">${it.ic}</span><span><span class="t ${lang}"></span>${it.py?'<span class="py"></span>':''}<span class="vi"></span></span>`;
+      b.querySelector(".t").textContent=it.t;
+      if(it.py) b.querySelector(".py").textContent=it.py;
+      b.querySelector(".vi").textContent=it.vi;
+      b.onclick=()=>{cueKey = cueKey===key?null:key; showCue(); renderRail();};
+      d.append(b);
+    });
+    rail.append(d);
+  });
+}
+function showCue(){
+  const c=$("cue");
+  if(!cueKey){c.hidden=true;return;}
+  const [si,ii]=cueKey.split("-").map(Number); const it=SCRIPT[lang][si]?.items[ii];
+  if(!it){cueKey=null;c.hidden=true;return;}
+  c.innerHTML=""; const b=document.createElement("b"); b.className=lang; b.textContent=it.t; c.append(b);
+  if(it.py){const s=document.createElement("small"); s.textContent=it.py; c.append(s);}
+  c.hidden=false;
+}
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  lang=t.dataset.lang;
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",String(x===t)));
+  cueKey=null; showCue(); renderRail();
+  try{localStorage.setItem("u7st-lang",lang)}catch(e){}
+});
+try{const l=localStorage.getItem("u7st-lang"); if(l==="zh"){lang="zh";$("tab-en").setAttribute("aria-selected","false");$("tab-zh").setAttribute("aria-selected","true");}}catch(e){}
+renderRail();
+
+/* ---------- Animal filters (drawn in face units: face width = 100, centre = 0,0) ---------- */
+const OUT="#3B2A22";
+function ell(c,x,y,rx,ry,rot,fill,stroke){c.beginPath();c.ellipse(x,y,rx,ry,rot||0,0,Math.PI*2);c.fillStyle=fill;c.fill();if(stroke){c.lineWidth=2.5;c.strokeStyle=stroke;c.stroke();}}
+function whiskers(c,n,len){c.strokeStyle=OUT;c.lineWidth=1.8;c.lineCap="round";
+  for(const s of[-1,1])for(let k=-1;k<=1;k++){c.beginPath();c.moveTo(n.x+s*12,n.y+5+k*4);c.lineTo(n.x+s*(12+len),n.y+2+k*10);c.stroke();}}
+const FILTERS={
+  none:{label:"Không",draw:null},
+  cat:{label:"Mèo",draw(c,f){
+    for(const s of[-1,1]){c.beginPath();c.moveTo(s*14,-46);c.lineTo(s*42,-96);c.lineTo(s*54,-36);c.closePath();c.fillStyle="#F2A23C";c.fill();c.lineWidth=2.5;c.strokeStyle=OUT;c.stroke();
+      c.beginPath();c.moveTo(s*24,-48);c.lineTo(s*41,-82);c.lineTo(s*47,-46);c.closePath();c.fillStyle="#FFB3C1";c.fill();}
+    const n=f.nose;c.beginPath();c.moveTo(n.x-7,n.y-3);c.lineTo(n.x+7,n.y-3);c.lineTo(n.x,n.y+5);c.closePath();c.fillStyle="#FF8FA8";c.fill();c.lineWidth=2;c.strokeStyle=OUT;c.stroke();
+    whiskers(c,n,38);}},
+  dog:{label:"Chó",draw(c,f){
+    for(const s of[-1,1]){ell(c,s*54,-20,16,40,s*0.35,"#A2683A",OUT);ell(c,s*54,-14,9,28,s*0.35,"#C98D59");}
+    const n=f.nose;ell(c,n.x,n.y,10,7,0,"#2A1D17",OUT);ell(c,n.x-3,n.y-2.5,3,1.8,0,"#fff");
+    const m=f.mouth;c.beginPath();c.moveTo(m.x-8,m.y+6);c.lineTo(m.x+8,m.y+6);c.lineTo(m.x+8,m.y+16);c.arc(m.x,m.y+16,8,0,Math.PI);c.closePath();c.fillStyle="#FF7896";c.fill();c.lineWidth=2;c.strokeStyle=OUT;c.stroke();
+    c.beginPath();c.moveTo(m.x,m.y+8);c.lineTo(m.x,m.y+18);c.strokeStyle="#D9506F";c.lineWidth=1.6;c.stroke();}},
+  bunny:{label:"Thỏ",draw(c,f){
+    for(const s of[-1,1]){ell(c,s*22,-104,15,50,s*0.16,"#FFFFFF",OUT);ell(c,s*22,-100,7,36,s*0.16,"#FFB3C8");}
+    const n=f.nose;ell(c,n.x,n.y,7,5,0,"#FF8FA8",OUT);
+    c.fillStyle="#fff";c.strokeStyle=OUT;c.lineWidth=1.8;for(const s of[-1,1]){c.beginPath();c.rect(n.x+(s<0?-7:1),n.y+10,6,9);c.fill();c.stroke();}
+    whiskers(c,n,30);}},
+  panda:{label:"Gấu trúc",draw(c,f){
+    for(const s of[-1,1])ell(c,s*44,-52,20,20,0,"#1E1E1E",OUT);
+    f.eyes.forEach((e,i)=>ell(c,e.x,e.y+1,17,12,(i?-1:1)*0.5,"rgba(25,25,25,.55)"));
+    const n=f.nose;ell(c,n.x,n.y,9,6,0,"#1E1E1E",OUT);}},
+  lion:{label:"Sư tử",draw(c,f){
+    const N=16;for(let i=0;i<N;i++){const a=i/N*Math.PI*2;ell(c,Math.cos(a)*68,Math.sin(a)*74-6,22,22,0,i%2?"#E8902A":"#F4B33F");}
+    for(const s of[-1,1]){ell(c,s*40,-62,14,14,0,"#E8A23A",OUT);ell(c,s*40,-62,7,7,0,"#F8D58F");}
+    const n=f.nose;c.beginPath();c.moveTo(n.x-9,n.y-4);c.lineTo(n.x+9,n.y-4);c.lineTo(n.x,n.y+6);c.closePath();c.fillStyle="#7A3E1D";c.fill();
+    c.fillStyle=OUT;for(const s of[-1,1])for(const p of[[10,10],[16,7],[16,14]]){c.beginPath();c.arc(n.x+s*p[0],n.y+p[1],1.6,0,7);c.fill();}}},
+  mouse:{label:"Chuột",draw(c,f){
+    for(const s of[-1,1]){ell(c,s*50,-50,28,28,0,"#A9A9B6",OUT);ell(c,s*50,-50,17,17,0,"#FFB6C6");}
+    const n=f.nose;ell(c,n.x,n.y,6,6,0,"#FF8FA8",OUT);whiskers(c,n,40);}}
+};
+let filter="none";
+try{const fv=localStorage.getItem("u7st-filter"); if(FILTERS[fv]) filter=fv;}catch(e){}
+const DEMO={cx:50,cy:56,w:52,ang:0,nose:{x:0,y:8},mouth:{x:0,y:26},eyes:[{x:-20,y:-10},{x:20,y:-10}]};
+function buildFilterRow(){
+  const row=$("frow"); row.innerHTML="";
+  Object.entries(FILTERS).forEach(([k,v])=>{
+    const b=document.createElement("button"); b.type="button"; b.className="fbtn"; b.setAttribute("aria-pressed",String(k===filter));
+    const cv=document.createElement("canvas"); cv.width=100; cv.height=100;
+    const c=cv.getContext("2d");
+    c.fillStyle="#F6D7B8"; c.beginPath(); c.ellipse(50,58,24,28,0,0,7); c.fill();
+    c.fillStyle="#3B2A22"; c.beginPath(); c.arc(41,52,2.6,0,7); c.arc(59,52,2.6,0,7); c.fill();
+    if(v.draw){c.save();c.translate(DEMO.cx,DEMO.cy);c.scale(DEMO.w/100,DEMO.w/100);v.draw(c,DEMO);c.restore();}
+    else{c.strokeStyle="#3B2A22";c.lineWidth=2;c.beginPath();c.arc(50,64,8,0.2,Math.PI-0.2);c.stroke();}
+    b.append(cv, document.createTextNode(v.label));
+    b.onclick=()=>{filter=k; try{localStorage.setItem("u7st-filter",k)}catch(e){} buildFilterRow(); if(k!=="none") loadDetector();};
+    row.append(b);
+  });
+}
+buildFilterRow();
+
+/* ---------- Face detection (MediaPipe, loaded only when a filter is chosen) ---------- */
+const MP="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+const MODEL="https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite";
+let detector=null, detState="idle"; // idle | loading | ready | failed
+function setStatus(t){const s=$("status"); if(!t){s.hidden=true;return;} s.textContent=t; s.hidden=false;}
+async function loadDetector(){
+  if(detState!=="idle") return; detState="loading"; if(stream) setStatus("Đang tải filter…");
+  try{
+    const vision=await Promise.race([import(MP+"/vision_bundle.mjs"),new Promise((_,r)=>setTimeout(()=>r(new Error("timeout")),20000))]);
+    const fs=await vision.FilesetResolver.forVisionTasks(MP+"/wasm");
+    const mk=d=>vision.FaceDetector.createFromOptions(fs,{baseOptions:{modelAssetPath:MODEL,delegate:d},runningMode:"VIDEO",minDetectionConfidence:0.5});
+    try{detector=await mk("GPU");}catch(e){detector=await mk("CPU");}
+    detState="ready"; setStatus(""); $("fnote").textContent="Filter đi theo khuôn mặt bé và được ghi vào video.";
+  }catch(e){
+    detState="failed"; setStatus("");
+    $("fnote").textContent="Không tải được bộ nhận diện khuôn mặt, filter sẽ đứng giữa khung hình. Bé ngồi giữa camera nhé.";
+  }
+}
+if(filter!=="none") loadDetector();
+
+/* ---------- Camera + render (front/back camera; audio kept separately so the camera can switch mid-recording) ---------- */
+const cam=document.createElement("video"); cam.playsInline=true; cam.muted=true; cam.setAttribute("playsinline","");
+const cv=$("cv"), ctx=cv.getContext("2d");
+let stream=null, audioTrack=null, facing="user", face=null, lastSeen=0, lastTs=-1;
+let crop={sx:0,sy:0,sw:1,sh:1,vw:1,vh:1};
+$("btnCam").onclick=startCam;
+function camErr(e){
+  return e.name==="NotAllowedError"
+    ? "Chưa có quyền dùng camera và micro. Bấm biểu tượng ổ khoá cạnh địa chỉ trang, chọn Cho phép, rồi bấm lại."
+    : e.name==="NotFoundError" ? "Không tìm thấy camera trên máy này."
+    : "Không mở được camera ở đây. Trang cần mở trên GitHub Pages (https). Trong khung xem trước của Claude, camera bị chặn.";
+}
+async function attach(s){
+  cam.srcObject=s; await cam.play().catch(()=>{});
+  await new Promise(r=>{if(cam.videoWidth) r(); else cam.onloadedmetadata=()=>r();});
+}
+async function startCam(){
+  const t=$("idleText");
+  if(!navigator.mediaDevices?.getUserMedia){t.textContent="Trình duyệt này không mở được camera. Hãy mở trang trên GitHub Pages (địa chỉ https) bằng Chrome hoặc Safari.";t.classList.add("err");return;}
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1280},height:{ideal:720}},audio:{echoCancellation:true,noiseSuppression:true}});
+  }catch(e){t.classList.add("err"); t.textContent=camErr(e); return;}
+  audioTrack=stream.getAudioTracks()[0]||null;
+  await attach(stream);
+  cv.width=cam.videoWidth||1280; cv.height=cam.videoHeight||720;   // canvas size stays fixed for the whole session
+  $("screen").style.aspectRatio=`${cv.width}/${cv.height}`;
+  $("idle").hidden=true; cv.hidden=false; $("btnRec").disabled=false;
+  try{const devs=await navigator.mediaDevices.enumerateDevices(); if(devs.filter(d=>d.kind==="videoinput").length>1) $("btnFlip").hidden=false;}catch(e){}
+  if(detState==="loading") setStatus("Đang tải filter…");
+  requestAnimationFrame(loop);
+}
+$("btnFlip").onclick=async()=>{
+  const want=facing==="user"?"environment":"user", b=$("btnFlip");
+  b.disabled=true;
+  let ns=null;
+  try{ns=await navigator.mediaDevices.getUserMedia({video:{facingMode:{exact:want},width:{ideal:1280},height:{ideal:720}},audio:false});}
+  catch(e){try{ns=await navigator.mediaDevices.getUserMedia({video:{facingMode:want},audio:false});}catch(e2){}}
+  if(!ns){b.disabled=false; $("fnote").textContent="Máy này không đổi được camera."; return;}
+  stream.getVideoTracks().forEach(t=>t.stop());
+  stream=new MediaStream([...ns.getVideoTracks(), ...(audioTrack?[audioTrack]:[])]);
+  facing=want; face=null;
+  await attach(ns);
+  $("mirror").checked = facing==="user";
+  b.textContent = facing==="user" ? "🔄 Camera sau" : "🔄 Camera trước";
+  $("fnote").textContent = facing==="user" ? "Filter đi theo khuôn mặt bé và được ghi vào video." : "Đang dùng camera sau để quay đồ vật. Filter chỉ hiện khi dùng camera trước.";
+  b.disabled=false;
+};
+function updateCrop(){
+  const vw=cam.videoWidth||1, vh=cam.videoHeight||1, W=cv.width, H=cv.height;
+  const s=Math.max(W/vw,H/vh), sw=W/s, sh=H/s;
+  crop={sx:(vw-sw)/2, sy:(vh-sh)/2, sw, sh, vw, vh};
+}
+const toC=(x,y)=>({x:(x-crop.sx)*cv.width/crop.sw, y:(y-crop.sy)*cv.height/crop.sh});
+const lerp=(a,b,k)=>a+(b-a)*k;
+function detect(){
+  if(detState!=="ready"||filter==="none"||facing!=="user") return;
+  const ts=performance.now(); if(ts<=lastTs) return; lastTs=ts;
+  let r; try{r=detector.detectForVideo(cam,ts);}catch(e){return;}
+  const d=r?.detections?.[0]; if(!d) return;
+  const bb=d.boundingBox,kp=d.keypoints||[], k=cv.width/crop.sw;
+  const P=i=>kp[i]?toC(kp[i].x*crop.vw,kp[i].y*crop.vh):null;
+  let e0=P(0),e1=P(1); if(e0&&e1&&e0.x>e1.x){const t=e0;e0=e1;e1=t;}
+  const c=toC(bb.originX+bb.width/2, bb.originY+bb.height/2);
+  const n={cx:c.x, cy:c.y, w:bb.width*k,
+    ang: e0&&e1 ? Math.atan2(e1.y-e0.y,e1.x-e0.x) : 0, eyesP:[e0,e1], noseP:P(2), mouthP:P(3)};
+  if(!face) face=n; else{
+    face.cx=lerp(face.cx,n.cx,.45); face.cy=lerp(face.cy,n.cy,.45); face.w=lerp(face.w,n.w,.35); face.ang=lerp(face.ang,n.ang,.35);
+    for(const k of["noseP","mouthP"]) if(n[k]) face[k]= face[k]?{x:lerp(face[k].x,n[k].x,.5),y:lerp(face[k].y,n[k].y,.5)}:n[k];
+    n.eyesP.forEach((e,i)=>{if(e) face.eyesP[i]= face.eyesP[i]?{x:lerp(face.eyesP[i].x,e.x,.5),y:lerp(face.eyesP[i].y,e.y,.5)}:e;});
+  }
+  lastSeen=ts;
+}
+function localFrame(){
+  const W=cv.width,H=cv.height;
+  if(facing!=="user") return null;
+  if(detState==="ready"){
+    if(!face||performance.now()-lastSeen>700) return null;
+    const s=face.w/100,cos=Math.cos(face.ang),sin=Math.sin(face.ang);
+    const L=(p,fb)=>{if(!p) return fb; const dx=(p.x-face.cx)/s,dy=(p.y-face.cy)/s; return {x:dx*cos+dy*sin,y:-dx*sin+dy*cos};};
+    return {cx:face.cx,cy:face.cy,w:face.w,ang:face.ang,nose:L(face.noseP,{x:0,y:8}),mouth:L(face.mouthP,{x:0,y:26}),
+      eyes:[L(face.eyesP[0],{x:-20,y:-10}),L(face.eyesP[1],{x:20,y:-10})]};
+  }
+  if(detState==="failed") return {...DEMO,cx:W/2,cy:H*0.46,w:Math.min(W,H)*0.36,ang:0};
+  return null;
+}
+function loop(){
+  if(!stream) return;
+  const W=cv.width,H=cv.height, mir=$("mirror").checked;
+  updateCrop(); detect();
+  ctx.save();
+  if(mir){ctx.translate(W,0);ctx.scale(-1,1);}
+  ctx.fillStyle="#000"; ctx.fillRect(0,0,W,H);
+  if(cam.readyState>=2) ctx.drawImage(cam,crop.sx,crop.sy,crop.sw,crop.sh,0,0,W,H);
+  const F=FILTERS[filter];
+  if(F.draw){const f=localFrame(); if(f){const s=f.w/100; ctx.save(); ctx.translate(f.cx,f.cy); ctx.rotate(f.ang); ctx.scale(s,s); F.draw(ctx,f); ctx.restore();}}
+  ctx.restore();
+  const name=$("kidName").value.trim();
+  if(name){
+    const fz=Math.round(H*0.055), pad=fz*0.5;
+    ctx.font=`800 ${fz}px "Baloo 2","Nunito",sans-serif`;
+    const label="⭐ "+name, tw=ctx.measureText(label).width;
+    const x=H*0.03,y=H-H*0.03-fz-pad*2;
+    ctx.fillStyle="rgba(255,200,58,.95)"; roundRect(ctx,x,y,tw+pad*2,fz+pad*2,fz*0.6); ctx.fill();
+    ctx.fillStyle="#1D2B36"; ctx.textBaseline="middle"; ctx.fillText(label,x+pad,y+pad+fz/2+1);
+  }
+  requestAnimationFrame(loop);
+}
+function roundRect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+
+/* ---------- Recording ---------- */
+let rec=null, chunks=[], blobUrl=null, mime="", t0=0, timer=null;
+function pickMime(){
+  if(!window.MediaRecorder) return null;
+  return ["video/mp4;codecs=avc1.42E01E,mp4a.40.2","video/mp4","video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"].find(t=>{try{return MediaRecorder.isTypeSupported(t)}catch(e){return false}})||"";
+}
+function lockTabs(on){document.querySelectorAll(".tab").forEach(t=>t.disabled=on);}
+$("btnRec").onclick=async()=>{
+  mime=pickMime();
+  if(mime===null||!cv.captureStream){$("fnote").textContent="Trình duyệt này chưa quay được video. Hãy dùng Chrome hoặc Safari bản mới.";return;}
+  $("btnRec").disabled=true; lockTabs(true);
+  const c=$("count");
+  for(const n of[3,2,1]){c.textContent=n;c.hidden=false;await new Promise(r=>setTimeout(r,900));}
+  c.hidden=true;
+  const out=cv.captureStream(30); if(audioTrack) out.addTrack(audioTrack);
+  chunks=[]; rec=new MediaRecorder(out, mime?{mimeType:mime,videoBitsPerSecond:2500000}:undefined);
+  rec.ondataavailable=e=>{if(e.data&&e.data.size) chunks.push(e.data);};
+  rec.onstop=showReview;
+  rec.start(500); t0=Date.now();
+  $("recBadge").hidden=false; $("btnRec").hidden=true; $("btnStop").hidden=false;
+  timer=setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);$("recTime").textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;},250);
+};
+$("btnStop").onclick=()=>{if(rec&&rec.state!=="inactive") rec.stop(); clearInterval(timer); $("recBadge").hidden=true; $("btnStop").hidden=true;};
+function showReview(){
+  const type=(rec.mimeType||mime||"video/webm").split(";")[0];
+  const blob=new Blob(chunks,{type}); if(blobUrl) URL.revokeObjectURL(blobUrl); blobUrl=URL.createObjectURL(blob);
+  const p=$("play"); p.src=blobUrl; p.hidden=false; cv.hidden=true; $("cue").hidden=true;
+  $("btnRetake").hidden=false; $("btnSave").hidden=false;
+  p.play().catch(()=>{});
+}
+$("btnRetake").onclick=()=>{
+  const p=$("play"); p.pause(); p.removeAttribute("src"); p.load(); p.hidden=true; cv.hidden=false; showCue();
+  $("btnRetake").hidden=true; $("btnSave").hidden=true; $("btnRec").hidden=false; $("btnRec").disabled=false; lockTabs(false);
+};
+$("btnSave").onclick=()=>{
+  if(!blobUrl) return;
+  const ext=(rec?.mimeType||mime).includes("mp4")?"mp4":"webm";
+  const nm=($("kidName").value.trim()||"be").replace(/[^\p{L}\p{N}]+/gu,"-");
+  const d=new Date(), stamp=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
+  const a=document.createElement("a"); a.href=blobUrl; a.download=`unit7-show-and-tell-${lang}-${nm}-${stamp}.${ext}`;
+  document.body.append(a); a.click(); a.remove();
+};
+})();
+</script>
+
+</body></html>
