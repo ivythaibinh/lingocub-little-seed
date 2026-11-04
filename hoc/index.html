@@ -12,7 +12,7 @@
 <script src="../nong-trai/img/atlas.js"></script>
 <script src="units.js"></script>
 <style>
-:root{color-scheme:light;--col:min(100vw,540px,max(360px,calc((100vh - 170px) * .606)));--grass:#8fd46c;--wood:#c98c4c;--wood-d:#8f5a2c}
+:root{color-scheme:light;--col:100vw;--grass:#8fd46c;--wood:#c98c4c;--wood-d:#8f5a2c}
 html{scroll-behavior:auto}
 body{background:#4f9a40;background-image:linear-gradient(90deg,rgba(0,0,0,.06) 50%,transparent 50%),linear-gradient(rgba(0,0,0,.05) 50%,transparent 50%);background-size:16px 16px;min-height:100vh;padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 img{-webkit-user-drag:none;user-select:none}
@@ -35,12 +35,12 @@ img{-webkit-user-drag:none;user-select:none}
 .tmode a{color:#ffd43b}
 
 /* bản đồ */
-.map{width:var(--col);margin:0 auto;position:relative;container-type:inline-size;box-shadow:-4px 0 0 var(--ink),4px 0 0 var(--ink),-10px 0 0 rgba(46,34,56,.18),10px 0 0 rgba(46,34,56,.18)}
+.map{width:100%;margin:0 auto;position:relative;--s:2.44}
 .scene{display:block;width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges}
 .unit,.cap{position:relative}
 
 /* biển tên Unit */
-.ubar{position:absolute;left:10px;right:10px;top:10px;z-index:3;display:flex;align-items:center;gap:10px;padding:4px 10px 4px 4px;background:#fff4d8}
+.ubar{position:absolute;left:max(10px,calc(50% - 300px));right:max(10px,calc(50% - 300px));top:10px;z-index:3;display:flex;align-items:center;gap:10px;padding:4px 10px 4px 4px;background:#fff4d8}
 .ubar .un{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:56px;padding:2px 6px 4px;background:var(--uc);color:#fff;line-height:.85;font-size:16px;text-shadow:2px 2px 0 rgba(0,0,0,.3);box-shadow:inset 0 -4px 0 rgba(0,0,0,.2)}
 .ubar .un b{font-family:'Silkscreen','VT323',monospace;font-size:30px;line-height:1}
 .ubar .ut{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1}
@@ -54,7 +54,7 @@ img{-webkit-user-drag:none;user-select:none}
 
 /* chặng */
 .stop{position:absolute;z-index:4;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px}
-.node{position:relative;width:clamp(58px,17cqw,80px);aspect-ratio:1;border:0;padding:0;cursor:pointer;background:var(--ink);
+.node{position:relative;width:clamp(58px,calc(var(--s) * 29px),104px);aspect-ratio:1;border:0;padding:0;cursor:pointer;background:var(--ink);
   --cp:polygon(30% 0,70% 0,70% 5%,85% 5%,85% 15%,95% 15%,95% 30%,100% 30%,100% 70%,95% 70%,95% 85%,85% 85%,85% 95%,70% 95%,70% 100%,30% 100%,30% 95%,15% 95%,15% 85%,5% 85%,5% 70%,0 70%,0 30%,5% 30%,5% 15%,15% 15%,15% 5%,30% 5%);
   clip-path:var(--cp);-webkit-clip-path:var(--cp);transition:transform .1s}
 .node:active{transform:translateY(3px)}
@@ -67,12 +67,15 @@ img{-webkit-user-drag:none;user-select:none}
 .stop.open .node{--nc:var(--green)}
 .stop.cur .node{--nc:var(--orange)}
 .stop.w.open .node{--nc:var(--blue)}
-.sh-ic{flex:none;width:84px;display:grid;place-items:center;margin-top:-6px}
+.sh-ic{flex:none;width:84px;height:84px;display:grid;place-items:center;margin-top:-6px;background:var(--blue);box-shadow:0 0 0 3px var(--ink)}
+.sh-ic .note{width:60px;height:60px}
+.node .note{width:62%;height:62%}
+.ic-note{flex:none;width:40px;height:40px;display:grid;place-items:center}.ic-note .note{width:36px;height:36px}
 .stop.done .node{--nc:var(--yellow)}
-.tag{font-size:19px;line-height:1;padding:2px 8px 3px;background:#fff4d8;color:var(--ink);white-space:nowrap;box-shadow:0 -2px 0 var(--ink),0 2px 0 var(--ink),-2px 0 0 var(--ink),2px 0 0 var(--ink),0 5px 0 rgba(46,34,56,.3)}
+.tag{font-size:clamp(19px,calc(var(--s) * 7.4px),26px);line-height:1;padding:2px 8px 3px;background:#fff4d8;color:var(--ink);white-space:nowrap;box-shadow:0 -2px 0 var(--ink),0 2px 0 var(--ink),-2px 0 0 var(--ink),2px 0 0 var(--ink),0 5px 0 rgba(46,34,56,.3)}
 .stop.locked .tag{background:#e7e1d6;color:#8f877d}
 .stop.cur .tag{background:var(--orange);color:#fff}
-.stop.cur::before{content:"";position:absolute;left:50%;top:0;width:clamp(58px,17cqw,80px);aspect-ratio:1;transform:translateX(-50%);background:rgba(255,212,59,.75);
+.stop.cur::before{content:"";position:absolute;left:50%;top:0;width:clamp(58px,calc(var(--s) * 29px),104px);aspect-ratio:1;transform:translateX(-50%);background:rgba(255,212,59,.75);
   clip-path:polygon(30% 0,70% 0,70% 5%,85% 5%,85% 15%,95% 15%,95% 30%,100% 30%,100% 70%,95% 70%,95% 85%,85% 85%,85% 95%,70% 95%,70% 100%,30% 100%,30% 95%,15% 95%,15% 85%,5% 85%,5% 70%,0 70%,0 30%,5% 30%,5% 15%,15% 15%,15% 5%,30% 5%);animation:ring 1.4s steps(6) infinite;z-index:-1}
 @keyframes ring{0%{transform:translateX(-50%) scale(1);opacity:.9}100%{transform:translateX(-50%) scale(1.55);opacity:0}}
 .bub{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:24px;letter-spacing:.06em;line-height:1;padding:6px 10px;background:#fff;color:var(--orange-d);
@@ -85,7 +88,7 @@ img{-webkit-user-drag:none;user-select:none}
 @keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
 
 /* nhân vật */
-.who{position:absolute;z-index:3;height:clamp(72px,21cqw,112px);width:auto;transform:translate(-50%,-58%);pointer-events:none;filter:drop-shadow(0 4px 0 rgba(46,34,56,.3));transition:filter .3s,opacity .3s}
+.who{position:absolute;z-index:3;height:clamp(72px,calc(var(--s) * 34px),140px);width:auto;transform:translate(-50%,-58%);pointer-events:none;filter:drop-shadow(0 4px 0 rgba(46,34,56,.3));transition:filter .3s,opacity .3s}
 .who.off{filter:grayscale(1) drop-shadow(0 4px 0 rgba(46,34,56,.2));opacity:.55}
 .who.hop{animation:hop 1.2s steps(3) infinite}
 @keyframes hop{50%{transform:translate(-50%,-64%)}}
@@ -96,12 +99,9 @@ img{-webkit-user-drag:none;user-select:none}
 .sign b{display:block;font-weight:400;font-size:clamp(30px,8vw,38px);letter-spacing:.08em}
 .sign small{font-size:20px}
 .cap .trophy{position:absolute;left:50%;transform:translateX(-50%);z-index:3}
-.review{position:relative;height:96px;background:
-  linear-gradient(90deg,transparent calc(49.4% - 6.6%),#c08a4e calc(49.4% - 6.6%),#c08a4e calc(49.4% - 5.4%),#eccb8c calc(49.4% - 5.4%),#eccb8c calc(49.4% + 5.4%),#c08a4e calc(49.4% + 5.4%),#c08a4e calc(49.4% + 6.6%),transparent calc(49.4% + 6.6%)),var(--grass)}
-.review .sign{top:50%;transform:translate(-50%,-50%);background:var(--blue-d);box-shadow:0 -4px 0 var(--ink),0 4px 0 var(--ink),-4px 0 0 var(--ink),4px 0 0 var(--ink),0 8px 0 rgba(46,34,56,.3),inset 0 -5px 0 #1d4f9e}
 
 /* nút dưới */
-.dock{position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:20;display:flex;gap:14px;width:calc(var(--col) - 24px);justify-content:center}
+.dock{position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:20;display:flex;gap:14px;width:min(calc(100vw - 24px),560px);justify-content:center}
 .dock .btn{flex:1;min-width:0;justify-content:center;flex-direction:column;gap:0;line-height:1;padding:8px 10px 10px;font-size:clamp(22px,5.8vw,28px)}
 .dock .btn small{font-size:.68em;opacity:.95;white-space:nowrap}
 .dock .now{background:var(--orange)}
@@ -142,7 +142,7 @@ img{-webkit-user-drag:none;user-select:none}
 .toast{position:fixed;left:12px;right:12px;margin:0 auto;width:fit-content;top:96px;z-index:60;text-align:center;padding:10px 16px;font-size:24px;line-height:1.05;background:#fff4d8}
 .toast.win{background:var(--yellow)}
 #fx{position:fixed;inset:0;z-index:61;pointer-events:none;width:100%;height:100%}
-.foot{width:var(--col);margin:0 auto;text-align:center;padding:14px 8px 0;font-size:18px;color:#fff}
+.foot{width:100%;margin:0 auto;text-align:center;padding:14px 8px 0;font-size:18px;color:#fff}
 .foot a{color:#fff}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
@@ -188,8 +188,7 @@ const TITLE = ["Khởi động","Bài 1 · Từ vựng","Bài 2 · Từ vựng",
 const SUB = ["Warm-up · hát cùng các bạn","Vocabulary 1","Vocabulary 2","Story","Practice"];
 const NS = 5;
 const ICON = {"warm-up":"speaker","vocab-1":"books","vocab-2":"books","story":"sparkles","practice":"gift","sat":"glowing_star"};
-const W = 160, H = 264, PTS = [[52,238],[106,194],[54,150],[106,106],[52,62]], MID = 79;
-const WHOX = [0,30,128,30,128];
+const H = 264, PTS = [[52,238],[106,194],[54,150],[106,106],[52,62]];   // điện thoại: cột 160 điểm ảnh; máy rộng hơn tính lại trong layout()
 
 /* ---------- hình từ bộ sprite ---------- */
 const sheets = {};
@@ -204,11 +203,26 @@ function spr(c, name, size, x, y){
   if(m && im) c.drawImage(im, m[0], m[1], m[2], m[3], Math.round(x - m[2]/2), Math.round(y - m[3]), m[2], m[3]);
 }
 
+/* ---------- bố cục: điện thoại giữ cột 160 điểm ảnh; tablet, laptop trải hết bề ngang ---------- */
+let L = null;
+function layout(){
+  const cw = document.documentElement.clientWidth || innerWidth;
+  let Wl = 160;
+  if(cw >= 600){ const s = Math.min((innerHeight - 170) / H, cw / 160, 3); Wl = Math.max(160, Math.round(cw / Math.max(2.2, s))); }
+  const mid = Math.round(Wl / 2), A = Wl <= 160 ? 27 : Math.round(Math.min(27 + (Wl - 160) * 0.15, 48)), wide = Wl >= 300;
+  const ys = PTS.map(p => p[1]), xs = [mid - A, mid + A, mid - A, mid + A, mid - A];
+  if(Wl === 160){ xs[0] = 52; xs[1] = 106; xs[2] = 54; xs[3] = 106; xs[4] = 52; }
+  const wx = xs.map(x => wide ? (x < mid ? x - 62 : x + 62) : (x < mid ? x + 72 : x - 72));
+  wx[0] = null;
+  return {W: Wl, mid, A, wide, pts: xs.map((x, i) => [x, ys[i]]), whox: wx, s: cw / Wl};
+}
+
 /* ---------- vẽ cảnh pixel ---------- */
 function rng(s){ return () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 function ctx(cv, w, h){ cv.width = w; cv.height = h; const c = cv.getContext("2d"); c.imageSmoothingEnabled = false; return c; }
 function R(c, x, y, w, h, col){ c.fillStyle = col; c.fillRect(x|0, y|0, w|0, h|0); }
 function disc(c, x, y, r, col){ c.fillStyle = col; for(let dy = -r; dy <= r; dy++){ const w = Math.floor(Math.sqrt(r*r - dy*dy)); c.fillRect((x|0) - w, (y|0) + dy, 2*w + 1, 1); } }
+function oval(c, x, y, a, b, col){ c.fillStyle = col; for(let dy = -b; dy <= b; dy++){ const w = Math.floor(a * Math.sqrt(1 - (dy*dy)/(b*b))); c.fillRect((x|0) - w, (y|0) + dy, 2*w + 1, 1); } }
 function grass(c, w, h, seed){
   const r = rng(seed);
   R(c, 0, 0, w, h, "#8fd46c");
@@ -231,56 +245,110 @@ function road(c, pts, seed){
   sm.forEach(p => disc(c, p[0], p[1], 8, "#eccb8c"));
   const r = rng(seed + 7);
   sm.forEach((p, i) => { if(i % 5 === 0){ R(c, p[0] + (r()*10 - 5), p[1] + (r()*10 - 5), 2, 1, "#d9b073"); } if(i % 9 === 0) R(c, p[0] + (r()*8 - 4), p[1] + (r()*8 - 4), 1, 1, "#fbe6b8"); });
+  return sm;
 }
 function shadow(c, x, y, w){ R(c, x - w/2, y - 1, w, 2, "rgba(46,90,30,.35)"); R(c, x - w/2 + 2, y + 1, w - 4, 1, "rgba(46,90,30,.25)"); }
+function put(c, n, s, x, y){ shadow(c, x, y, s === 32 ? 22 : s === 24 ? 18 : 12); spr(c, n, s, x, y); }
+
+/* đồ trang trí hai bên (chỉ khi màn hình rộng) */
+function field(c, x, y, w, h, crop){
+  R(c, x - 1, y - 1, w + 2, h + 2, "#7a4a22"); R(c, x, y, w, h, "#a8743f");
+  for(let yy = y + 3; yy < y + h - 2; yy += 9){ R(c, x + 2, yy, w - 4, 3, "#8f5f30"); for(let xx = x + 8; xx < x + w - 4; xx += 13) spr(c, crop, 14, xx, yy + 3); }
+}
+function pond(c, x, y, a, b){
+  oval(c, x, y + 2, a + 2, b + 2, "rgba(46,90,30,.3)"); oval(c, x, y, a + 2, b + 2, "#2b6fd6"); oval(c, x, y, a, b, "#4aa8ff");
+  R(c, x - a/2, y - 2, a/3, 1, "#8fd0ff"); R(c, x + 2, y + 3, a/4, 1, "#8fd0ff");
+}
+function fence(c, x, y, w){
+  R(c, x, y - 7, w, 2, "#c58a4e"); R(c, x, y - 3, w, 2, "#c58a4e");
+  for(let xx = x; xx <= x + w - 2; xx += 7){ R(c, xx - 1, y - 11, 4, 12, "#2e2238"); R(c, xx, y - 10, 2, 10, "#e0a35f"); }
+}
+function sides(c, U, sm, h, seed){
+  const r = rng(seed), mid = L.mid, keep = L.wide ? L.A + 62 + 26 : L.A + 36, zone = mid - keep;
+  if(zone < 40) return;
+  const busy = [];   // ô đã có đồ: [x0,y0,x1,y1]
+  const free = (x0, y0, x1, y1) => !busy.some(b => x0 < b[2] && x1 > b[0] && y0 < b[3] && y1 > b[1]);
+  const theme = (U && U.deco) || ["flower","tulip"];
+  const crops = ["carrot","cabbage","tomato","corn","pumpkin","potato","strawberry","sunflower"];
+  [0, 1].forEach(side => {
+    const x0 = side ? mid + keep : 0, x1 = side ? L.W : mid - keep, cx = (x0 + x1) / 2;
+    const kind = ((U ? U.n : 0) + side) % 2;
+    if(h > 200){
+      if(kind === 0){
+        const fw = Math.min(64, x1 - x0 - 16), fh = 40, fy = Math.round(h * .32 + r() * 30);
+        field(c, cx - fw/2, fy, fw, fh, crops[(seed + side * 3) % crops.length]); fence(c, cx - fw/2 - 4, fy + fh + 12, fw + 8);
+        busy.push([cx - fw/2 - 8, fy - 6, cx + fw/2 + 8, fy + fh + 14]);
+      }else{
+        const a = Math.min(30, (x1 - x0) / 2 - 10), py = Math.round(h * .5 + r() * 30);
+        pond(c, cx, py, a, 14); spr(c, "duck", 18, cx - 6, py + 2);
+        busy.push([cx - a - 6, py - 20, cx + a + 6, py + 18]);
+      }
+    }
+    const pool = [["tree",32],["tree",32],["tree",32],["tree",32],[theme[0],24],[theme[1],24],["flower",18],["tulip",18],["sunflower",18],["rose",18],["chicken",24],["rabbit",24],["cow",24],["pig",24]];
+    let placed = 0, pets = 0;
+    for(let t = 0; t < 120 && placed < (h > 200 ? 7 : 3); t++){
+      const [n, s] = pool[r() * pool.length | 0], pet = s === 24 && /chicken|rabbit|cow|pig/.test(n);
+      if(pet && pets >= 2) continue;
+      const x = x0 + 14 + r() * (x1 - x0 - 28), y = 40 + r() * (h - 44);
+      if(!free(x - 16, y - 34, x + 16, y + 4)) continue;
+      put(c, n, s, x, y); busy.push([x - 16, y - 34, x + 16, y + 4]); placed++; if(pet) pets++;
+    }
+  });
+}
 function drawUnit(cv, U){
-  const c = ctx(cv, W, H);
+  const W = L.W, c = ctx(cv, W, H), P5 = L.pts, mid = L.mid;
   grass(c, W, H, U.n * 977);
-  road(c, [[MID,H+24],[MID,H],...PTS,[MID,0],[MID,-24]], U.n);
+  const sm = road(c, [[mid,H+24],[mid,H],...P5,[mid,0],[mid,-24]], U.n);
   const d = U.deco || [];
-  [[138,254,d[0],24],[16,164,d[1],24],[146,120,"tree",32],[16,76,"tree",32]].forEach(([x,y,n,s]) => { if(!n) return; shadow(c, x, y, s === 32 ? 22 : 18); spr(c, n, s, x, y); });
+  if(L.wide){
+    // cạnh mỗi chặng chỉ để một hình nhỏ; còn lại ra hai bên
+    sides(c, U, sm, H, U.n * 31 + 5);
+  }else{
+    const p = P5;
+    if(W === 160) [[p[0][0]+86,254,d[0],24],[p[2][0]-38,164,d[1],24],[p[3][0]+40,120,"tree",32],[p[4][0]-36,76,"tree",32]].forEach(([x,y,n,s]) => { if(n) put(c, n, s, x, y); });
+    if(W > 160) sides(c, U, sm, H, U.n * 31 + 5);
+  }
 }
 function drawCap(cv, top){
-  const h = top ? 150 : 110, c = ctx(cv, W, h);
+  const W = L.W, mid = L.mid, h = top ? 150 : 110, c = ctx(cv, W, h);
   if(top){
     grass(c, W, h, 31);
     R(c, 0, 0, W, 64, "#9fdcff"); R(c, 0, 60, W, 4, "#bfe8ff");
-    [[30,22],[118,14]].forEach(([x,y]) => { R(c,x,y,22,6,"#fff"); R(c,x+4,y-4,12,4,"#fff"); R(c,x-2,y+2,26,3,"#fff"); });
+    for(let x = 20; x < W; x += 96){ const y = 12 + (x * 7 % 14); R(c,x,y,22,6,"#fff"); R(c,x+4,y-4,12,4,"#fff"); R(c,x-2,y+2,26,3,"#fff"); }
     for(let x = 0; x < W; x += 6){ R(c, x, 62, 4, 4, "#6cb850"); }
-    road(c, [[MID,h+24],[MID,h],[MID,96],[MID,88]], 99);
-    disc(c, MID, 90, 14, "#c08a4e"); disc(c, MID, 90, 12, "#eccb8c");
+    const sm = road(c, [[mid,h+24],[mid,h],[mid,96],[mid,88]], 99);
+    disc(c, mid, 90, 14, "#c08a4e"); disc(c, mid, 90, 12, "#eccb8c");
+    if(L.wide){ const r = rng(3); for(let x = 16; x < W; x += 34){ if(Math.abs(x - mid) < 70) continue; put(c, r() < .7 ? "tree" : "sunflower", r() < .7 ? 32 : 24, x + r()*8, 104 + r()*36); } }
   }else{
     grass(c, W, h, 57);
-    road(c, [[MID,-24],[MID,0],[MID,50],[MID,58]], 5);
-    disc(c, MID, 56, 14, "#c08a4e"); disc(c, MID, 56, 12, "#eccb8c");
-    shadow(c, 30, 96, 22); spr(c, "tree", 32, 30, 96);
-    shadow(c, 134, 90, 22); spr(c, "house", 32, 134, 90);
+    road(c, [[mid,-24],[mid,0],[mid,50],[mid,58]], 5);
+    disc(c, mid, 56, 14, "#c08a4e"); disc(c, mid, 56, 12, "#eccb8c");
+    put(c, "tree", 32, mid - 49, 96); put(c, "house", 32, mid + 55, 90);
+    if(L.wide){ const r = rng(9); for(let x = 16; x < W; x += 34){ if(Math.abs(x - mid) < 90) continue; put(c, r() < .6 ? "tree" : "chicken", r() < .6 ? 32 : 24, x + r()*8, 40 + r()*60); } }
   }
 }
 
 /* ---------- dựng bản đồ ---------- */
 const map = $("map"), NODES = {}, WHOS = {}, BARS = {};
-function pct(x, y, h){ return "left:" + (x/W*100) + "%;top:" + (y/(h||H)*100) + "%"; }
+function pct(x, y, h){ return "left:" + (x/L.W*100) + "%;top:" + (y/(h||H)*100) + "%"; }
 function build(){
-  const S = P.status();
+  L = layout();
+  map.innerHTML = "";
+  map.style.setProperty("--s", L.s.toFixed(3));
   // đích
   const top = document.createElement("section"); top.className = "cap"; top.id = "finish";
   top.innerHTML = '<canvas class="scene"></canvas><div class="trophy" style="top:42%">' + icon("trophy", 32, 3) + '</div><div class="sign" style="top:8%"><b>CHUNG KẾT</b><small>Hoàn thành Little Seed!</small></div>';
   map.appendChild(top);
   for(let i = UNITS.length - 1; i >= 0; i--){
     const U = UNITS[i];
-    if(U.n === P.OPEN_UPTO){
-      const rv = document.createElement("div"); rv.className = "review"; rv.id = "review";
-      rv.innerHTML = '<div class="sign"><b>ÔN TẬP</b><small>Unit ' + P.OPEN_UPTO + ' → 1 · lớp đã học</small></div>';
-      map.appendChild(rv);
-    }
+    if(U.n === P.OPEN_UPTO){ const rv = document.createElement("div"); rv.id = "review"; map.appendChild(rv); }
     const sec = document.createElement("section");
     sec.className = "unit c" + ((U.n - 1) % 4); sec.id = "unit-" + U.n;
-    let h = '<canvas class="scene" width="'+W+'" height="'+H+'"></canvas>' +
+    let h = '<canvas class="scene"></canvas>' +
       '<div class="ubar pxf"><span class="un">UNIT<b>' + U.n + '</b></span><span class="ut"><b>' + esc(U.en) + '</b><small>' + esc(U.vi) + ' · <span class="zh">' + U.zh + '</span></small></span><span class="up" data-up></span></div>';
     for(let s = 0; s < NS; s++){
-      if(WHO[s]) h += '<img class="who" src="../assets/pixel/farmer-' + WHO[s] + '.webp" alt="" style="' + pct(WHOX[s], PTS[s][1]) + '" data-who="' + U.n + '-' + s + '">';
-      h += '<div class="stop" style="' + pct(PTS[s][0], PTS[s][1]) + '" data-stop="' + U.n + '-' + s + '"><button class="node" type="button" aria-label="Unit ' + U.n + ' · ' + TITLE[s] + '"><span class="f"></span></button><span class="tag">' + TAG[s] + '</span></div>';
+      if(WHO[s]) h += '<img class="who" src="../assets/pixel/farmer-' + WHO[s] + '.webp" alt="" style="' + pct(L.whox[s], L.pts[s][1]) + '" data-who="' + U.n + '-' + s + '">';
+      h += '<div class="stop" style="' + pct(L.pts[s][0], L.pts[s][1]) + '" data-stop="' + U.n + '-' + s + '"><button class="node" type="button" aria-label="Unit ' + U.n + ' · ' + TITLE[s] + '"><span class="f"></span></button><span class="tag">' + TAG[s] + '</span></div>';
     }
     sec.innerHTML = h;
     map.appendChild(sec);
@@ -299,6 +367,8 @@ function build(){
 }
 function drawCaps(){ drawCap($("finish").querySelector("canvas"), true); drawCap($("start").querySelector("canvas"), false); }
 function redrawAll(){ UNITS.forEach(U => drawUnit(BARS[U.n].querySelector("canvas"), U)); drawCaps(); const t = $("finish").querySelector(".trophy"); t.innerHTML = icon("trophy", 32, 3); }
+/* nốt nhạc pixel cho chặng Khởi động */
+const NOTE = '<svg class="note" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><g fill="#2e2238" transform="translate(1 1)"><path d="M6 2h8v3H8v6H6zM12 5h2v5h-2zM3 11h4v1h1v2H7v1H3v-1H2v-2h1zM9 10h4v1h1v2h-1v1H9v-1H8v-2h1z"/></g><g fill="#fff"><path d="M6 2h8v3H8v6H6zM12 5h2v5h-2zM3 11h4v1h1v2H7v1H3v-1H2v-2h1zM9 10h4v1h1v2h-1v1H9v-1H8v-2h1z"/></g></svg>';
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
 /* ---------- tô trạng thái ---------- */
@@ -314,7 +384,7 @@ function paint(){
       const el = NODES[u.n + "-" + s], cur = S.cur.u === u.n && S.cur.s === s && !S.cur.all;
       el.className = "stop " + (s === 0 ? "w " : "") + (!st.open ? "locked" : st.done ? "done" : cur ? "cur" : "open");
       const f = el.querySelector(".f");
-      f.innerHTML = !st.open ? icon("locked", 24, 1.4) : st.done ? icon("star", 24, 1.5) + '<span class="mini">' + (s || "♪") + '</span>' : s === 0 ? icon("speaker", 24, 1.6) : '<span class="num">' + s + '</span>';
+      f.innerHTML = !st.open ? icon("locked", 24, 1.4) : st.done ? icon("star", 24, 1.5) + '<span class="mini">' + (s || "♪") + '</span>' : s === 0 ? NOTE : '<span class="num">' + s + '</span>';
       let b = el.querySelector(".bub");
       if(cur && !b){ b = document.createElement("span"); b.className = "bub"; b.textContent = "BẮT ĐẦU"; el.prepend(b); }
       if(!cur && b) b.remove();
@@ -346,10 +416,10 @@ function tap(n, s){
 function openSheet(n, s){
   const U = UNITS[n - 1], u = S.units[n - 1], st = U.stages[s];
   const lines = st.lines.filter(Boolean).map(l => /[一-鿿]/.test(l) ? '<span class="zh">' + esc(l) + '</span>' : esc(l)).join("<br>");
-  let h = '<div class="sh-h">' + (WHO[s] ? '<img src="../assets/pixel/farmer-' + WHO[s] + '.webp" alt="">' : '<span class="sh-ic">' + icon("speaker", 32, 2.2) + '</span>') + '<div><span class="chip">UNIT ' + n + ' · ' + (s ? "BÀI " + s : "KHỞI ĐỘNG") + '</span><h3>' + TITLE[s] + '<small>' + SUB[s] + '</small></h3><p>' + lines + '</p></div><button class="x" type="button" data-x aria-label="Đóng">X</button></div><div class="items">';
+  let h = '<div class="sh-h">' + (WHO[s] ? '<img src="../assets/pixel/farmer-' + WHO[s] + '.webp" alt="">' : '<span class="sh-ic">' + NOTE + '</span>') + '<div><span class="chip">UNIT ' + n + ' · ' + (s ? "BÀI " + s : "KHỞI ĐỘNG") + '</span><h3>' + TITLE[s] + '<small>' + SUB[s] + '</small></h3><p>' + lines + '</p></div><button class="x" type="button" data-x aria-label="Đóng">X</button></div><div class="items">';
   st.items.forEach(it => {
     const ok = u.items[it.k];
-    h += '<button class="btn item' + (ok ? " ok" : "") + '" type="button" data-go="' + it.k + '">' + icon(ICON[it.k], 24, 1.5) + '<span class="t">' + it.label + '<small>' + (ok ? "Đã xong · học lại" : "Bấm để vào học") + '</small></span><span class="st">' + (ok ? "✓" : "▶") + '</span></button>';
+    h += '<button class="btn item' + (ok ? " ok" : "") + '" type="button" data-go="' + it.k + '">' + (it.k === "warm-up" ? '<span class="ic-note">' + NOTE + '</span>' : icon(ICON[it.k], 24, 1.5)) + '<span class="t">' + it.label + '<small>' + (ok ? "Đã xong · học lại" : "Bấm để vào học") + '</small></span><span class="st">' + (ok ? "✓" : "▶") + '</span></button>';
   });
   h += '</div>';
   const need = s === 0 ? "Không bắt buộc: con hát trước hoặc vào thẳng Bài 1 đều được." : s === 4 ? (n < P.LAST ? "Xong bài này thì mở Unit " + (n + 1) + "." : "Bài cuối của Little Seed!") : "Xong bài này thì mở Bài " + (s + 1) + ".";
@@ -463,8 +533,13 @@ $("kid").addEventListener("click", () => window.LC && LC.login());
 
 /* ---------- chạy ---------- */
 build(); paint();
+let rz = 0, lastW = document.documentElement.clientWidth;
+addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => {
+  const w = document.documentElement.clientWidth; if(Math.abs(w - lastW) < 8) return; lastW = w;
+  build(); paint(); scrollToCur(false);
+}, 250); });
 requestAnimationFrame(() => { scrollToCur(false); route(); checkSeen(); });
-Promise.all([loadSheet(24), loadSheet(32)]).then(() => { redrawAll(); paint(); $("farmBtn").innerHTML = icon("sunflower", 24, 1.5); });
+Promise.all([loadSheet(14), loadSheet(18), loadSheet(24), loadSheet(32)]).then(() => { redrawAll(); paint(); $("farmBtn").innerHTML = icon("sunflower", 24, 1.5); });
 P.sync(ok => { if(!ok) return; paint(); try{ localStorage.setItem(seenKey(), JSON.stringify(snapshot())); }catch(e){} });
 addEventListener("storage", () => { if(viewer.hidden) paint(); });
 addEventListener("lc-progress", paint);
