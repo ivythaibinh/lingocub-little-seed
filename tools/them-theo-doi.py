@@ -135,13 +135,13 @@ def main():
         if t != t0:
             f.write_text(t, encoding="utf-8"); changed += 1
         report.append("unit-%d (trang Unit): %s" % (unit, "đã gắn" if n else "có sẵn"))
-    f = ROOT / "index.html"
+    f = ROOT / "hoc" / "index.html"   # trang chọn Unit (trang chủ gốc giờ là trang pixel)
     t0 = f.read_text(encoding="utf-8")
-    t, _ = add_tag(t0, "assets/lc-track.js")
+    t, _ = add_tag(t0, "../assets/lc-track.js")
     t, n = patch_home(t)
     if t != t0:
         f.write_text(t, encoding="utf-8"); changed += 1
-    report.append("trang chủ: %s" % ("đã gắn" if n else "có sẵn"))
+    report.append("trang chọn Unit (hoc/): %s" % ("đã gắn" if n else "có sẵn"))
     print("\n".join(report))
     print("Đã sửa %d tệp." % changed)
 
