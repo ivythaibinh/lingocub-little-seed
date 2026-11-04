@@ -139,7 +139,23 @@
     sync(function (ok) { if (ok) apply(); });
   }
 
-  window.LCPATH = { status: status, sync: sync, teacher: teacher, OPEN_UPTO: OPEN_UPTO, LAST: LAST, FOLDER: FOLDER, STAGES: STAGES, hub: hub };
+
+  /* ---------- trong trang bài học: chưa mở khóa thì đưa về bản đồ ---------- */
+  function guard() {
+    var m = location.pathname.match(/unit-(\d+)\/([a-z0-9-]+)\/(index\.html?)?$/);
+    if (!m) return;
+    var n = +m[1], key = null;
+    Object.keys(FOLDER).forEach(function (k) { if (FOLDER[k] === m[2]) key = k; });
+    if (!key) return;
+    var S = status(), U = S.units[n - 1];
+    if (U && !(U.open && U.stages[stageOf(key)].open)) {
+      var dest = ROOT + "hoc/";
+      try { if (window.top !== window) window.top.location.replace(dest); else location.replace(dest); } catch (e) { location.replace(dest); }
+    }
+  }
+
+  window.LCPATH = { status: status, sync: sync, teacher: teacher, OPEN_UPTO: OPEN_UPTO, LAST: LAST, FOLDER: FOLDER, STAGES: STAGES, hub: hub, guard: guard };
+  if (me && me.getAttribute("data-guard") === "1") guard();
   if (me && me.getAttribute("data-hub") === "1") {
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", hub); else hub();
   }
