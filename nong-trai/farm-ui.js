@@ -161,19 +161,70 @@
   }
   document.addEventListener("click", function (e) { var b = e.target.closest("[data-deploy]"); if (b) act(F.deploy(b.dataset.deploy)); });
 
-  /* ---------- cảnh nông trại ---------- */
-  var W = 360, H = 252, cv = $("fc"), ctx = PX.canvas(cv, W, H), hits = [], tags = [];
-  var SLOT = {
-    S: function (i) { return { x: 70 + (i % 4) * 26, y: 6 + Math.floor(i / 4) * 26, w: 22, h: 22 }; },
-    M: function (i) { return { x: 70 + (i % 2) * 52, y: 60 + Math.floor(i / 2) * 28, w: 48, h: 22 }; },
-    L: function (i) { return { x: 178 + (i % 3) * 54, y: 6 + Math.floor(i / 3) * 56, w: 50, h: 52 }; }
+  /* ---------- cảnh nông trại ----------
+     Hai bố cục: "ngang" (máy tính, máy tính bảng) và "dọc" (điện thoại: vừa khít bề ngang, chỉ cuộn xuống). */
+  var LAYOUTS = {
+    wide: {
+      W: 360, H: 252,
+      S: function (i) { return { x: 70 + (i % 4) * 26, y: 6 + Math.floor(i / 4) * 26, w: 22, h: 22 }; },
+      M: function (i) { return { x: 70 + (i % 2) * 52, y: 60 + Math.floor(i / 2) * 28, w: 48, h: 22 }; },
+      L: function (i) { return { x: 178 + (i % 3) * 54, y: 6 + Math.floor(i / 3) * 56, w: 50, h: 52 }; },
+      spots: {
+        dog: [[2, 42], [20, 50], [38, 42]], cat: [[4, 66], [24, 72], [40, 64]],
+        chicken: [[72, 138], [92, 146], [80, 162]], rabbit: [[120, 138], [140, 148], [124, 164]],
+        pig: [[72, 190], [98, 204], [70, 212]], duck: [[144, 190], [162, 200], [176, 188]],
+        cow: [[208, 138], [250, 148], [210, 186]], buffalo: [[292, 138], [300, 186], [256, 194]]
+      },
+      duckNoPond: function (i) { return [150 + i * 14, 164 + (i % 2) * 8]; },
+      paths: [[58, 40, 8, 212], [0, 120, 360, 8]],
+      barn: [6, 2],
+      builds: { well: [32, 90, 24], wheelbarrow: [2, 92, 24], windmill: [6, 132, 40], bigbarn: [12, 176, 32], tractor: [18, 212, 24] },
+      scarecrow: [336, 30],
+      green: [66, 2, 110, 56],
+      shelters: [[66, 0, 110], [174, 0, 166]], shelterTag: [121, 4],
+      shade: [66, 2, 274, 112], shadeTag: [200, 4],
+      windFence: [66, 356, 112],
+      yard: [66, 198, 130, 228], pond: [160, 200, 26, 14],
+      pasture: [202, 358, 130, 228], lockAt: [268, 168], lockTag: [280, 205],
+      decor: function (i) { return i < 18 ? [70 + i * 16, 232] : [4 + ((i - 18) % 3) * 17, 234 - Math.floor((i - 18) / 3) * 18]; }, decorMax: 30,
+      lanterns: [[60, 100], [60, 160], [60, 220], [120, 116], [240, 116]],
+      animalTag: [130, 136], rainbow: [320, 84]
+    },
+    tall: {
+      W: 220, H: 486,
+      S: function (i) { return { x: 4 + (i % 4) * 26, y: 44 + Math.floor(i / 4) * 26, w: 22, h: 22 }; },
+      M: function (i) { return { x: 112 + (i % 2) * 52, y: 44 + Math.floor(i / 2) * 28, w: 48, h: 22 }; },
+      L: function (i) { return { x: 4 + (i % 4) * 54, y: 102 + Math.floor(i / 4) * 56, w: 50, h: 52 }; },
+      spots: {
+        dog: [[54, 16], [72, 22], [90, 16]], cat: [[112, 18], [130, 24], [148, 18]],
+        chicken: [[14, 272], [36, 282], [22, 302]], rabbit: [[64, 272], [86, 284], [70, 304]],
+        pig: [[12, 316], [40, 314], [110, 270]], duck: [[150, 300], [168, 310], [184, 298]],
+        cow: [[14, 368], [62, 380], [20, 404]], buffalo: [[112, 368], [164, 380], [122, 404]]
+      },
+      duckNoPond: function (i) { return [150 + i * 16, 296 + (i % 2) * 8]; },
+      paths: [[0, 40, 220, 3], [0, 212, 220, 8]],
+      barn: [4, 0],
+      builds: { well: [4, 224, 24], wheelbarrow: [34, 226, 24], windmill: [66, 220, 40], bigbarn: [114, 222, 32], tractor: [156, 226, 24] },
+      scarecrow: [194, 8],
+      green: [2, 42, 108, 54],
+      shelters: [[2, 38, 216], [2, 96, 216]], shelterTag: [110, 40],
+      shade: [2, 40, 216, 170], shadeTag: [110, 42],
+      windFence: [0, 220, 206],
+      yard: [4, 216, 260, 342], pond: [172, 316, 28, 13],
+      pasture: [4, 216, 354, 440], lockAt: [98, 384], lockTag: [110, 424],
+      decor: function (i) { return [4 + (i % 13) * 16, 448 + Math.floor(i / 13) * 18]; }, decorMax: 26,
+      lanterns: [[50, 40], [110, 214], [200, 214], [4, 254], [200, 350]],
+      animalTag: [110, 266], rainbow: [150, 2]
+    }
   };
-  var SPOTS = {
-    dog: [[2, 42], [20, 50], [38, 42]], cat: [[4, 66], [24, 72], [40, 64]],
-    chicken: [[72, 138], [92, 146], [80, 162]], rabbit: [[120, 138], [140, 148], [124, 164]],
-    pig: [[72, 190], [98, 204], [70, 212]], duck: [[144, 190], [162, 200], [176, 188]],
-    cow: [[208, 138], [250, 148], [210, 186]], buffalo: [[292, 138], [300, 186], [256, 194]]
-  };
+  var LY = LAYOUTS.wide, W = LY.W, H = LY.H, cv = $("fc"), ctx = PX.canvas(cv, W, H), hits = [], tags = [];
+  var SLOT = { S: function (i) { return LY.S(i); }, M: function (i) { return LY.M(i); }, L: function (i) { return LY.L(i); } };
+  function pickLayout() {
+    var box = $("stage").parentNode, wdt = box.clientWidth || innerWidth, want = wdt < 600 ? LAYOUTS.tall : LAYOUTS.wide;
+    if (want === LY && cv.width === W) return false;
+    LY = want; W = LY.W; H = LY.H; ctx = PX.canvas(cv, W, H); document.body.classList.toggle("tall-farm", LY === LAYOUTS.tall);
+    return true;
+  }
   var ASIZE = { pig: 24, cow: 32, buffalo: 32 };
   var wiltCache = {};
   function wiltSpr(c, name, size, x, y) {
@@ -221,29 +272,28 @@
     D.ANIMALS.forEach(function (a) {
       var n = st.animals[a.id] || 0, s = ASIZE[a.id] || 18, prod = F.productToday(a.id);
       for (var i = 0; i < n; i++) {
-        var p = SPOTS[a.id][i], x = p[0], y = p[1];
-        if (a.id === "duck" && !st.builds.pond) { x = 150 + i * 14; y = 164 + (i % 2) * 8; }
+        var p = LY.spots[a.id][i], x = p[0], y = p[1];
+        if (a.id === "duck" && !st.builds.pond) { var q0 = LY.duckNoPond(i); x = q0[0]; y = q0[1]; }
         PX.spr(ctx, a.id, s, x, y, { flip: i % 2 === 1 });
         if (mood === "sleep") PX.spr(ctx, "zzz", 14, x + s - 4, y - 8);
         else if (mood === "sad" || mood === "cold") { PX.R(ctx, x + s - 2, y - 4, 7, 7, "#2e2238"); PX.R(ctx, x + s - 1, y - 3, 5, 5, "#fff"); PX.R(ctx, x + s + 1, y - 2, 1, 2, "#2e2238"); PX.R(ctx, x + s + 1, y + 1, 1, 1, "#2e2238"); }
         hit(x, y, s + 2, s + 2, { kind: "animal", id: a.id });
       }
-      if (n && prod) { var q = SPOTS[a.id][0]; PX.spr(ctx, a.product, 14, q[0] + s, q[1] + s - 10); PX.sparkle(ctx, q[0] + s + 10, q[1] + s - 14); hit(q[0] + s, q[1] + s - 12, 16, 16, { kind: "animal", id: a.id }); }
+      if (n && prod) { var q = LY.spots[a.id][0]; PX.spr(ctx, a.product, 14, q[0] + s, q[1] + s - 10); PX.sparkle(ctx, q[0] + s + 10, q[1] + s - 14); hit(q[0] + s, q[1] + s - 12, 16, 16, { kind: "animal", id: a.id }); }
     });
   }
 
+  function pen(c, r) { var x0 = r[0], x1 = r[1], y0 = r[2], y1 = r[3]; PX.fence(c, x0, x1, y0); PX.vfence(c, x0, y0 + 10, y1 + 4); PX.vfence(c, x1 - 3, y0 + 10, y1 + 4); PX.fence(c, x0, x1, y1); }
+
   function draw() {
+    pickLayout();
     var st = F.state(), t = F.today(), w = F.weatherOf(t), lv = F.level().n, dep = F.protectedOn(t);
     hits = []; tags = [];
-    var c = ctx;
+    var c = ctx, b;
     PX.grass(c, 0, 0, W, H, 11, w === "snowy" ? "#9fcf8f" : "#5ba84b", w === "snowy" ? "#87b979" : "#47903b", w === "snowy" ? "#e8f4ff" : "#70bd5c");
-    PX.path(c, 58, 40, 8, H - 40, 3); PX.path(c, 0, 120, W, 8, 5);
-    PX.barn(c, 6, 2); hit(6, 2, 44, 36, { kind: "barn" });
-    if (st.builds.well) { PX.spr(c, "well", 24, 32, 90); hit(32, 90, 26, 26, { kind: "item", id: "well" }); }
-    if (st.builds.wheelbarrow) { PX.spr(c, "wheelbarrow", 24, 2, 92); hit(2, 92, 26, 26, { kind: "item", id: "wheelbarrow" }); }
-    if (st.builds.windmill) { PX.spr(c, "windmill", 40, 6, 132); hit(6, 132, 42, 42, { kind: "item", id: "windmill" }); }
-    if (st.builds.bigbarn) { PX.spr(c, "bigbarn", 32, 12, 176); hit(12, 176, 34, 34, { kind: "item", id: "bigbarn" }); }
-    if (st.builds.tractor) { PX.spr(c, "tractor", 24, 18, 212); hit(18, 212, 26, 26, { kind: "item", id: "tractor" }); }
+    LY.paths.forEach(function (p, i) { PX.path(c, p[0], p[1], p[2], p[3], 3 + i * 2); });
+    PX.barn(c, LY.barn[0], LY.barn[1]); hit(LY.barn[0], LY.barn[1], 44, 36, { kind: "barn" });
+    Object.keys(LY.builds).forEach(function (id) { if (!st.builds[id]) return; b = LY.builds[id]; PX.spr(c, id, b[2], b[0], b[1]); hit(b[0], b[1], b[2] + 2, b[2] + 2, { kind: "item", id: id }); });
     /* ô đất */
     F.slots().forEach(drawPlot);
     D.PLOTS.forEach(function (p) {
@@ -251,42 +301,46 @@
       var r = SLOT[p.size](n), lock = F.lockReason(p);
       PX.plot(c, r.x, r.y, r.w, r.h, { locked: true }); PX.R(c, r.x + r.w / 2 - 1, r.y + r.h / 2 - 3, 3, 7, "#fff4d8"); PX.R(c, r.x + r.w / 2 - 3, r.y + r.h / 2 - 1, 7, 3, "#fff4d8");
       hit(r.x, r.y, r.w, r.h, { kind: "buyplot", id: p.id });
-      if (p.size !== "S" || n === st.plots.S) tag(r.x + r.w / 2, r.y + r.h + 3, lock ? PX.icon("locked", 14, 1) + esc(lock) : "＋ " + p.price + STAR(), "");
+      tag(r.x + r.w / 2, r.y + r.h + 3, lock ? PX.icon("locked", 14, 1) + esc(lock) : "＋ " + p.price + STAR(), "");
     });
     /* che chắn đang dựng */
-    if (st.builds.greenhouse) { c.fillStyle = "rgba(190,235,250,.22)"; c.fillRect(66, 2, 110, 56); PX.R(c, 66, 2, 110, 1, "#cfefff"); PX.R(c, 66, 57, 110, 1, "#cfefff"); for (var gx = 66; gx <= 176; gx += 22) PX.R(c, gx, 2, 1, 56, "rgba(120,190,220,.8)"); }
+    if (st.builds.greenhouse) { var g = LY.green; c.fillStyle = "rgba(190,235,250,.22)"; c.fillRect(g[0], g[1], g[2], g[3]); PX.R(c, g[0], g[1], g[2], 1, "#cfefff"); PX.R(c, g[0], g[1] + g[3] - 1, g[2], 1, "#cfefff"); for (var gx = g[0]; gx <= g[0] + g[2]; gx += 22) PX.R(c, gx, g[1], 1, g[3], "rgba(120,190,220,.8)"); }
     var need = D.WEATHER[w].need || [];
-    if (dep && need.indexOf("shelter") >= 0) { PX.shelter(c, 66, 0, 110); PX.shelter(c, 174, 0, 166); tag(121, 4, PX.icon("check", 14, 1) + "Mái che", "good"); }
-    if (dep && need.indexOf("sunshade") >= 0) { PX.shade(c, 66, 2, 274, 112); tag(200, 4, PX.icon("check", 14, 1) + "Lưới che nắng", "good"); }
-    if (dep && need.indexOf("fence") >= 0) { PX.fence(c, 66, 356, 112); }
-    if (st.tools.scarecrow) { PX.spr(c, "scarecrow", 24, 336, 30); hit(336, 30, 24, 26, { kind: "item", id: "scarecrow" }); }
+    if (dep && need.indexOf("shelter") >= 0) { LY.shelters.forEach(function (s2) { PX.shelter(c, s2[0], s2[1], s2[2]); }); tag(LY.shelterTag[0], LY.shelterTag[1], PX.icon("check", 14, 1) + "Mái che", "good"); }
+    if (dep && need.indexOf("sunshade") >= 0) { PX.shade(c, LY.shade[0], LY.shade[1], LY.shade[2], LY.shade[3]); tag(LY.shadeTag[0], LY.shadeTag[1], PX.icon("check", 14, 1) + "Lưới che nắng", "good"); }
+    if (dep && need.indexOf("fence") >= 0) PX.fence(c, LY.windFence[0], LY.windFence[1], LY.windFence[2]);
+    if (st.tools.scarecrow) { PX.spr(c, "scarecrow", 24, LY.scarecrow[0], LY.scarecrow[1]); hit(LY.scarecrow[0], LY.scarecrow[1], 24, 26, { kind: "item", id: "scarecrow" }); }
     /* sân và đồng cỏ */
-    PX.fence(c, 66, 198, 130); PX.vfence(c, 66, 140, 232); PX.vfence(c, 195, 140, 232); PX.fence(c, 66, 198, 228);
-    if (st.builds.pond) { PX.pond(c, 160, 200, 26, 14); hit(134, 186, 52, 28, { kind: "item", id: "pond" }); }
-    PX.fence(c, 202, 358, 130); PX.vfence(c, 202, 140, 232); PX.vfence(c, 355, 140, 232); PX.fence(c, 202, 358, 228);
-    if (lv < 4) { c.fillStyle = "rgba(0,0,0,.14)"; c.fillRect(205, 141, 150, 87); PX.spr(c, "locked", 24, 268, 168); tag(280, 205, PX.icon("locked", 14, 1) + "Đồng cỏ · Cấp 4", ""); hit(205, 141, 150, 87, { kind: "pasture" }); }
+    pen(c, LY.yard);
+    if (st.builds.pond) { var pd = LY.pond; PX.pond(c, pd[0], pd[1], pd[2], pd[3]); hit(pd[0] - pd[2], pd[1] - pd[3], pd[2] * 2, pd[3] * 2, { kind: "item", id: "pond" }); }
+    pen(c, LY.pasture);
+    if (lv < 4) {
+      var pa = LY.pasture; c.fillStyle = "rgba(0,0,0,.14)"; c.fillRect(pa[0] + 3, pa[2] + 11, pa[1] - pa[0] - 6, pa[3] - pa[2] - 11);
+      PX.spr(c, "locked", 24, LY.lockAt[0], LY.lockAt[1]); tag(LY.lockTag[0], LY.lockTag[1], PX.icon("locked", 14, 1) + "Đồng cỏ · Cấp 4", "");
+      hit(pa[0] + 3, pa[2] + 11, pa[1] - pa[0] - 6, pa[3] - pa[2] - 11, { kind: "pasture" });
+    }
     drawAnimals();
-    /* hàng trang trí */
+    /* trang trí */
     st.decor.forEach(function (id, i) {
-      var x = i < 18 ? 70 + i * 16 : 4 + ((i - 18) % 3) * 17, y = i < 18 ? 234 : 236 - Math.floor((i - 18) / 3) * 18;
-      if (i >= 30) return;
-      PX.spr(c, id, PX.has(id, 18) ? 18 : 18, x, y - 2);
-      hit(x, y - 2, 18, 18, { kind: "item", id: id });
+      if (i >= LY.decorMax) return;
+      var p = LY.decor(i);
+      PX.spr(c, id, 18, p[0], p[1]);
+      hit(p[0], p[1], 18, 18, { kind: "item", id: id });
     });
-    if (dep && need.indexOf("lantern") >= 0) [[60, 100], [60, 160], [60, 220], [120, 116], [240, 116]].forEach(function (p) { PX.spr(c, "lantern", 14, p[0], p[1]); });
-    if (dep && need.indexOf("blanket") >= 0) tag(130, 136, PX.icon("check", 14, 1) + "Chăn ấm", "good");
-    if (dep && need.indexOf("raincoat") >= 0) tag(130, 136, PX.icon("check", 14, 1) + "Áo mưa", "good");
+    if (dep && need.indexOf("lantern") >= 0) LY.lanterns.forEach(function (p) { PX.spr(c, "lantern", 14, p[0], p[1]); });
+    if (dep && need.indexOf("blanket") >= 0) tag(LY.animalTag[0], LY.animalTag[1], PX.icon("check", 14, 1) + "Chăn ấm", "good");
+    if (dep && need.indexOf("raincoat") >= 0) tag(LY.animalTag[0], LY.animalTag[1], PX.icon("check", 14, 1) + "Áo mưa", "good");
     /* hiệu ứng thời tiết */
-    var seed = Math.floor(Date.now() / 700);
-    if (w === "rainy") { PX.tint(c, W, H, "rgba(40,60,120,.10)"); PX.rain(c, W, H, seed, 320); }
-    if (w === "stormy") { PX.tint(c, W, H, "rgba(30,30,80,.22)"); PX.rain(c, W, H, seed, 480); if (seed % 7 === 0) PX.tint(c, W, H, "rgba(255,255,220,.25)"); }
-    if (w === "snowy") { PX.tint(c, W, H, "rgba(230,240,255,.18)"); PX.snow(c, W, H, seed, 260); }
+    var seed = Math.floor(Date.now() / 700), k = W * H / (360 * 252);
+    if (w === "rainy") { PX.tint(c, W, H, "rgba(40,60,120,.10)"); PX.rain(c, W, H, seed, 320 * k); }
+    if (w === "stormy") { PX.tint(c, W, H, "rgba(30,30,80,.22)"); PX.rain(c, W, H, seed, 480 * k); if (seed % 7 === 0) PX.tint(c, W, H, "rgba(255,255,220,.25)"); }
+    if (w === "snowy") { PX.tint(c, W, H, "rgba(230,240,255,.18)"); PX.snow(c, W, H, seed, 260 * k); }
     if (w === "foggy") PX.tint(c, W, H, "rgba(235,240,245," + (dep ? ".28" : ".5") + ")");
     if (w === "hot") PX.tint(c, W, H, "rgba(255,150,40,.12)");
     if (w === "cold") PX.tint(c, W, H, "rgba(120,170,255,.14)");
-    if (w === "windy") PX.wind(c, W, H, seed, 26);
+    if (w === "windy") PX.wind(c, W, H, seed, 26 * k);
     if (w === "cloudy") PX.tint(c, W, H, "rgba(80,90,110,.06)");
-    if (w === "rainbow") PX.spr(c, "rainbow", 32, 320, 84);
+    if (w === "rainbow") PX.spr(c, "rainbow", 32, LY.rainbow[0], LY.rainbow[1]);
     if (F.sleepy()) PX.tint(c, W, H, "rgba(20,20,60,.18)");
     $("stage").querySelectorAll(".tagc").forEach(function (e) { e.remove(); });
     tags.forEach(function (tg) {
@@ -436,7 +490,7 @@
   document.body.style.backgroundImage = "url(" + PX.tile(64, 64, 4, "#6fbf5b", "#62b04f", "#7dcc68") + ")";
   document.body.style.backgroundSize = "256px 256px";
   PX.loadAtlas().then(function () { all(); animate(); F.sync(); });
-  var rzT = 0; addEventListener("resize", function () { clearTimeout(rzT); rzT = setTimeout(calendar, 200); });
+  var rzT = 0; addEventListener("resize", function () { clearTimeout(rzT); rzT = setTimeout(function () { calendar(); if (pickLayout()) draw(); }, 200); });
   document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") { F.refresh(); F.sync(); } });
   setInterval(function () { var d = F.today(); if (d !== window.__day) { window.__day = d; F.refresh(); animate(); } }, 60000); window.__day = F.today();
 })();

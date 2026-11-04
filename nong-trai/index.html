@@ -68,10 +68,12 @@
   .tmr{font-size:19px;color:#345;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
   /* nông trại */
   .farmbox{padding:8px;background:#3b2416}
-  .stage{line-height:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .stage{line-height:0}
   .sc{position:relative}
   .sc canvas{width:100%;height:auto;display:block;cursor:pointer}
-  @media (max-width:760px){.sc{min-width:720px}.stage::after{content:"";display:block}}
+  /* điện thoại: nông trại dùng bố cục dọc, vừa khít bề ngang, không phải trượt sang */
+  body.tall-farm .farmbox{padding:5px}
+  body.tall-farm .tagc{font-size:13px;padding:0 3px}
   .tagc{position:absolute;transform:translate(-50%,-50%);font-size:clamp(13px,1.5vw,19px);line-height:1.2;padding:0 5px;background:#fff;color:var(--ink);box-shadow:0 0 0 2px var(--ink);display:flex;align-items:center;gap:3px;white-space:nowrap;pointer-events:none}
   .tagc.warn{background:#ffe0dc}.tagc.good{background:#d9f7d2}
   .tools{display:flex;flex-wrap:wrap;gap:12px;padding:12px 4px 4px;align-items:center}
@@ -119,12 +121,49 @@
   .boom{position:fixed;inset:0;z-index:70;display:grid;place-items:center;background:rgba(46,34,56,.55)}
   .boom .pxf{padding:18px 26px;text-align:center;font-size:30px}
   .boom .pxf b{display:block;font-size:46px;font-weight:400;color:var(--orange-d)}
+  /* nút nhạc, hướng dẫn */
+  .hbtns{display:flex;gap:10px}
+  .hb{position:relative;font-size:22px;padding:2px 10px;background:#8b5cf6;--b:3px;gap:6px}
+  #helpBtn{background:var(--blue);min-width:42px;justify-content:center;font-size:26px}
+  .hb.mute{background:#8a8090}.hb.mute .pxi{position:relative}
+  .hb.mute::after{content:"";position:absolute;left:8px;top:50%;width:22px;height:3px;background:#ef5b5b;transform:rotate(-40deg);box-shadow:0 0 0 1px var(--ink)}
+  /* hướng dẫn từng bước */
+  .gd{position:fixed;inset:0;z-index:90}
+  .gd-block{position:absolute;inset:0}
+  .gd.dim .gd-block{background:rgba(46,34,56,.55)}
+  .gd-hole{position:fixed;box-shadow:0 0 0 9999px rgba(46,34,56,.55);outline:4px solid var(--yellow);outline-offset:0;pointer-events:none;transition:top .15s,left .15s,width .15s,height .15s}
+  .gd-card{position:fixed;width:min(430px,calc(100vw - 16px));padding:10px 14px 10px;background:var(--paper)}
+  .gd-hd{display:flex;align-items:center;gap:10px;font-size:20px;color:var(--mute)}
+  .gd-hd img{height:46px;width:auto}
+  .gd-x{margin-left:auto;align-self:flex-start;font-size:28px;line-height:1;border:0;background:none;cursor:pointer;color:var(--ink);padding:0 4px}
+  .gd-tx{font-size:22px;line-height:1.2;margin:6px 0 10px}
+  .gd-tx b{font-weight:400;color:var(--orange-d)}
+  .gd-ft{display:flex;justify-content:space-between;gap:10px}
+  .gd-b{font-size:24px;padding:4px 14px}
+  .gd-off{display:block;margin:12px auto 2px;border:0;background:none;font-size:19px;color:var(--mute);text-decoration:underline;cursor:pointer}
+  /* điện thoại: thời tiết → nông trại → khu đổi sao → lịch tuần → cây lớp, để bé thấy nông trại ngay */
+  @media (max-width:600px){
+    .main{display:flex;flex-direction:column;gap:22px;padding:16px 12px 0}
+    .wrap,.wrap2{display:contents}
+    #news{order:1}#farmSec{order:2}.shop{order:3}.cal{order:4}#cls{order:5}
+    .top{gap:8px 10px;padding:8px 12px}
+    .top h1{font-size:22px;min-width:0;flex:1 1 120px}
+    .hb{font-size:18px;padding:2px 8px}.hb span{display:none}#helpBtn{font-size:22px;min-width:34px}
+    .back{font-size:20px}
+    .lvl{flex:1 1 180px;width:auto;min-width:0;font-size:17px}.lvl b{font-size:21px}
+    .stars{font-size:28px}
+    .news{gap:10px;padding:8px 10px;flex-wrap:wrap}
+    .news .mc{height:64px;margin:0}
+    .bub{min-width:0;flex:1 1 200px}
+    .bub .en{font-size:24px}.bub .zhl{font-size:20px}.bub .vi{font-size:19px}
+    .spk{width:30px;height:30px}
+  }
   @media (max-width:1100px){.wrap2{grid-template-columns:minmax(0,1fr)}.shop{order:2}}
   @media (max-width:860px){.wrap{grid-template-columns:minmax(0,1fr)}.act{width:100%}.news .mc{height:90px}}
   @media (max-width:560px){
     body{font-size:20px}.days{gap:5px}.d .n small{display:none}.d .s{font-size:17px}
-    .grid{grid-template-columns:1fr}.tabs{grid-template-columns:repeat(2,1fr)}.top .lg{display:none}.lvl{width:100%}
-    .bub .en{font-size:26px}.tools .info{margin-left:0}
+    .grid{grid-template-columns:1fr}.tabs{grid-template-columns:repeat(2,1fr)}.top .lg{display:none}
+    .tools .info{margin-left:0}
   }
 </style>
 </head>
@@ -133,12 +172,14 @@
   <a class="btn back" href="../">◀ Trang chủ</a>
   <img class="lg" src="../assets/pixel/logo.webp" alt="Lingo Cub">
   <h1 id="title">Nông trại của bé</h1>
+  <div class="hbtns"><button class="btn hb" type="button" id="musicBtn">Nhạc</button><button class="btn hb" type="button" id="helpBtn" title="Xem hướng dẫn" aria-label="Xem hướng dẫn">?</button></div>
   <div class="lvl pxf" id="lvl"></div>
   <div class="stars pxf" id="stars"></div>
 </header>
 
+<main class="main">
 <div class="wrap">
-  <section class="cal pxf">
+  <section class="cal pxf" id="cal">
     <h2><span id="calIc"></span>Lịch tuần này<span class="r" id="calRange"></span></h2>
     <div class="days" id="days"></div>
     <div class="wk" id="wk"></div>
@@ -148,13 +189,13 @@
 </div>
 
 <div class="wrap2">
-  <section>
+  <section id="farmSec">
     <div class="farmbox pxf">
       <div class="stage"><div class="sc" id="stage"><canvas id="fc" class="px"></canvas></div></div>
       <div class="tools" id="tools"></div>
     </div>
   </section>
-  <section class="shop pxf">
+  <section class="shop pxf" id="shop">
     <h2><span id="shopIc"></span>Khu đổi sao<span class="r" id="shopStars" style="color:var(--ink);display:flex;align-items:center;gap:2px"></span></h2>
     <div class="tabs" id="tabs"></div>
     <div class="grid" id="grid"></div>
@@ -162,10 +203,13 @@
   </section>
 </div>
 
+</main>
+
 <script src="img/atlas.js"></script>
 <script src="../assets/pixel/px.js"></script>
 <script src="data.js"></script>
 <script src="farm-core.js"></script>
 <script src="farm-ui.js"></script>
+<script src="extra.js"></script>
 </body>
 </html>

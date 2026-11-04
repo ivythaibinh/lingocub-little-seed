@@ -84,5 +84,8 @@ Bé học để kiếm sao, rồi đổi sao lấy hạt giống, con vật, câ
 - **Đổi giá, cấp, tên món:** sửa `nong-trai/data.js`. Âm thanh ở `nong-trai/audio/<id>_en.mp3` và `<id>_zh.mp3`; nguồn giọng ghi ở `nong-trai/audio/SOURCES.md`.
 - **Hình:** con vật, rau quả, thời tiết chuyển từ bộ Fluent Emoji của Microsoft (giấy phép MIT) sang pixel (`nong-trai/img/atlas-*.png`); chuồng, hàng rào, bù nhìn, giếng… vẽ bằng code (`assets/pixel/px.js`). Font VT323 và Silkscreen (giấy phép OFL, kèm trong `assets/pixel/`). Chữ Hán dùng font có sẵn của máy.
 - Nông trại lưu trên máy và trên trang tính **"Nông trại"** của Google Sheet (tự tạo khi bé lưu lần đầu).
+- **Nhạc nền:** `nong-trai/music/nhac-nen.mp3` (bản "Cheerful Village Market and Mischievous Tune" chị Duyên gửi), đã hạ âm lượng còn 1/4 ngay trong file. Nút **Nhạc** trên thanh đầu trang để tắt / bật; máy nhớ lựa chọn. Trình duyệt chỉ cho phát nhạc sau lần chạm đầu tiên.
+- **Hướng dẫn chơi:** lần đầu vào nông trại hiện hướng dẫn 10 bước (khoanh từng khu, có Quay lại / Tiếp, dấu ✕ để đóng, nút "Không hiện lại lần sau" — nhớ theo từng bé). Nút **?** trên thanh đầu trang mở lại hướng dẫn. Nội dung sửa trong `nong-trai/extra.js`.
+- **Điện thoại:** màn hình hẹp (dưới 600px) dùng bố cục nông trại dọc, vừa khít bề ngang, không phải trượt sang; trang xếp lại: thời tiết → nông trại → khu đổi sao → lịch tuần → cây lớp.
 
 **Sau khi cập nhật bản này:** mở Apps Script, thay toàn bộ mã bằng `apps-script/Code.gs` mới → Lưu → Triển khai → Quản lý các bản triển khai → bút chì → Phiên bản mới → Triển khai (link /exec giữ nguyên). Không cần chạy lại `caiDat` (chạy lại cũng được: hàm sẽ thêm ô B4 và trang "Nông trại").
