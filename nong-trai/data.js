@@ -1,5 +1,6 @@
 /* Nông trại Lingo Cub — danh mục vật phẩm (giá, cấp, tên 3 thứ tiếng).
-   Giá đặt để: mỗi món 1 cái ≈ 610 sao (bé đúng khoảng 60% một lượt cả web); mua tối đa mọi thứ ≈ 940 sao (một lượt đúng 100% ≈ 975 sao).
+   Giá đặt để: mỗi món 1 cái ≈ 660 sao (bé đúng khoảng 65–70% một lượt cả web); mua tối đa mọi thứ ≈ 880 sao (một lượt đúng 100% ≈ 975 sao).
+   Ô đất 1 · 3 · 5 sao; hạt giống từ 5 sao. Bán 1 lứa rau luôn được nhiều hơn tiền hạt (lãi 3–7 sao).
    Sửa giá / cấp ở đây. id cũng là tên file âm thanh: audio/<id>_en.mp3, audio/<id>_zh.mp3 */
 window.FARM_DATA = {
   CAP_DAY: 40,          // sao học tối đa mỗi ngày
@@ -17,18 +18,18 @@ window.FARM_DATA = {
   ],
   /* rau: plot S = ô nhỏ, M = ô vừa; days = số ngày lớn; sell = giá bán 1 phần thu hoạch */
   CROPS: [
-    { id: "carrot", vi: "Cà rốt", en: "Carrot", zh: "胡萝卜", py: "húluóbo", plot: "S", price: 1, days: 2, lv: 1, sell: 3 },
-    { id: "potato", vi: "Khoai tây", en: "Potato", zh: "土豆", py: "tǔdòu", plot: "S", price: 1, days: 2, lv: 1, sell: 3 },
-    { id: "cabbage", vi: "Bắp cải", en: "Cabbage", zh: "白菜", py: "báicài", plot: "S", price: 1, days: 2, lv: 1, sell: 3 },
-    { id: "tomato", vi: "Cà chua", en: "Tomato", zh: "西红柿", py: "xīhóngshì", plot: "S", price: 1, days: 3, lv: 1, sell: 5 },
-    { id: "sweetpotato", vi: "Khoai lang", en: "Sweet potato", zh: "红薯", py: "hóngshǔ", plot: "S", price: 2, days: 3, lv: 2, sell: 5 },
-    { id: "strawberry", vi: "Dâu tây", en: "Strawberry", zh: "草莓", py: "cǎoméi", plot: "S", price: 2, days: 4, lv: 2, sell: 8 },
-    { id: "sunflower", vi: "Hướng dương", en: "Sunflower", zh: "向日葵", py: "xiàngrìkuí", plot: "S", price: 2, days: 3, lv: 2, sell: 6 },
-    { id: "cucumber", vi: "Dưa chuột", en: "Cucumber", zh: "黄瓜", py: "huángguā", plot: "M", price: 1, days: 2, lv: 2, sell: 5 },
-    { id: "corn", vi: "Ngô", en: "Corn", zh: "玉米", py: "yùmǐ", plot: "M", price: 1, days: 3, lv: 2, sell: 5 },
-    { id: "rice", vi: "Lúa", en: "Rice", zh: "水稻", py: "shuǐdào", plot: "M", price: 2, days: 4, lv: 3, sell: 7 },
-    { id: "pumpkin", vi: "Bí ngô", en: "Pumpkin", zh: "南瓜", py: "nánguā", plot: "M", price: 2, days: 4, lv: 3, sell: 8 },
-    { id: "watermelon", vi: "Dưa hấu", en: "Watermelon", zh: "西瓜", py: "xīguā", plot: "M", price: 3, days: 5, lv: 3, sell: 9 }
+    { id: "carrot", vi: "Cà rốt", en: "Carrot", zh: "胡萝卜", py: "húluóbo", plot: "S", price: 5, days: 2, lv: 1, sell: 7 },
+    { id: "potato", vi: "Khoai tây", en: "Potato", zh: "土豆", py: "tǔdòu", plot: "S", price: 5, days: 2, lv: 1, sell: 7 },
+    { id: "cabbage", vi: "Bắp cải", en: "Cabbage", zh: "白菜", py: "báicài", plot: "S", price: 5, days: 2, lv: 1, sell: 7 },
+    { id: "tomato", vi: "Cà chua", en: "Tomato", zh: "西红柿", py: "xīhóngshì", plot: "S", price: 5, days: 3, lv: 1, sell: 8 },
+    { id: "sweetpotato", vi: "Khoai lang", en: "Sweet potato", zh: "红薯", py: "hóngshǔ", plot: "S", price: 10, days: 3, lv: 2, sell: 13 },
+    { id: "strawberry", vi: "Dâu tây", en: "Strawberry", zh: "草莓", py: "cǎoméi", plot: "S", price: 10, days: 4, lv: 2, sell: 15 },
+    { id: "sunflower", vi: "Hướng dương", en: "Sunflower", zh: "向日葵", py: "xiàngrìkuí", plot: "S", price: 10, days: 3, lv: 2, sell: 13 },
+    { id: "cucumber", vi: "Dưa chuột", en: "Cucumber", zh: "黄瓜", py: "huángguā", plot: "M", price: 5, days: 2, lv: 2, sell: 7 },
+    { id: "corn", vi: "Ngô", en: "Corn", zh: "玉米", py: "yùmǐ", plot: "M", price: 5, days: 3, lv: 2, sell: 8 },
+    { id: "rice", vi: "Lúa", en: "Rice", zh: "水稻", py: "shuǐdào", plot: "M", price: 10, days: 4, lv: 3, sell: 15 },
+    { id: "pumpkin", vi: "Bí ngô", en: "Pumpkin", zh: "南瓜", py: "nánguā", plot: "M", price: 10, days: 4, lv: 3, sell: 15 },
+    { id: "watermelon", vi: "Dưa hấu", en: "Watermelon", zh: "西瓜", py: "xīguā", plot: "M", price: 15, days: 5, lv: 3, sell: 21 }
   ],
   /* hạt giống của tuần (thưởng học 5 ngày/tuần, không bán trong cửa hàng) */
   SPECIAL: [
@@ -116,9 +117,9 @@ window.FARM_DATA = {
   ],
   /* ô đất */
   PLOTS: [
-    { id: "smallplot", size: "S", vi: "Ô nhỏ", en: "Small plot", zh: "小块地", py: "xiǎo kuài dì", start: 4, max: 8, price: 5, lv: 1, use: "Trồng rau nhỏ, hoa" },
-    { id: "mediumplot", size: "M", vi: "Ô vừa", en: "Medium plot", zh: "中块地", py: "zhōng kuài dì", start: 0, max: 4, price: 10, lv: 2, use: "Trồng rau to; rau nhỏ thu ×2" },
-    { id: "largeplot", size: "L", vi: "Ô lớn", en: "Large plot", zh: "大块地", py: "dà kuài dì", start: 0, max: 6, price: 20, lv: 3, use: "Trồng cây ăn quả; rau thu ×4" }
+    { id: "smallplot", size: "S", vi: "Ô nhỏ", en: "Small plot", zh: "小块地", py: "xiǎo kuài dì", start: 4, max: 8, price: 1, lv: 1, use: "Trồng rau nhỏ, hoa" },
+    { id: "mediumplot", size: "M", vi: "Ô vừa", en: "Medium plot", zh: "中块地", py: "zhōng kuài dì", start: 0, max: 4, price: 3, lv: 2, use: "Trồng rau to; rau nhỏ thu ×2" },
+    { id: "largeplot", size: "L", vi: "Ô lớn", en: "Large plot", zh: "大块地", py: "dà kuài dì", start: 0, max: 6, price: 5, lv: 3, use: "Trồng cây ăn quả; rau thu ×4" }
   ],
   /* thời tiết. need = đồ phải dựng; câu tiếng Anh/Trung có file audio/w-<id>_en|zh.mp3 */
   WEATHER: {
