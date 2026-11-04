@@ -75,7 +75,8 @@ Bé học để kiếm sao, rồi đổi sao lấy hạt giống, con vật, câ
 
 - **Sao học:** 1 câu đúng = 1 sao (Vocab, Practice, quiz truyện), 1 bài khởi động hát hết = 1 sao, video Show and Tell = 5 sao (1 lần / Unit). Mỗi trò chỉ tính lượt cao nhất trong ngày; tối đa 40 sao học / ngày. Sao tự cộng từ điểm các trò đang ghi về Google Sheet, nên bé học trên máy khác vẫn được tính.
 - **Bán nông sản** được thêm sao để mua đồ (tối đa 10 sao / ngày); sao bán hàng không tính lên cấp.
-- **Cấp nông trại** (theo tổng sao học): 0 · 80 · 200 · 350 · 600 · 1.000 · 1.500.
+- **Cấp nông trại** (theo tổng sao học): 0 · 50 · 120 · 220 · 340 · 460 · 600.
+- **Giá:** mỗi món 1 cái tổng khoảng 610 sao (bé đúng khoảng 60% một lượt cả web là đủ); mua tối đa mọi thứ khoảng 940 sao (một lượt đúng 100% được khoảng 975 sao). Bé dư sao thì nuôi thêm con (tối đa 3 con mỗi loài), mua thêm ô đất, cây, trang trí.
 - **Bỏ học:** 1–2 ngày cây héo, thú buồn (chơi 1 trò là tươi lại); từ 3 ngày cây ngừng lớn, thú ngủ. Không bao giờ mất đồ.
 - **Thời tiết:** tính theo ngày, cả trung tâm cùng một thời tiết, xem trước 2 ngày trên lịch tuần. Ngày xấu (mưa, gió, giông bão, nóng, lạnh, tuyết, sương mù) bé bấm **Dựng đồ che** (cần có đủ đồ và đã chơi 1 trò hôm đó; dựng trước từ hôm trước cũng được). Không che thì lứa đó thu một nửa, trứng sữa hôm đó giảm. Cầu vồng: thu hoạch gấp đôi.
 - **Điểm danh tuần:** học 3 ngày → 3 phân bón; 5 ngày → hạt giống của tuần (không bán trong cửa hàng).
