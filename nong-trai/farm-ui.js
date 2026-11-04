@@ -81,7 +81,7 @@
   /* ---------- đầu trang ---------- */
   function header() {
     var u = LC.user(), L = F.level(), S = F.stars();
-    $("title").textContent = "Nông trại của " + (u ? u.name : "bé");
+    $("title").textContent = F.isDemo() ? "Nông trại mẫu · Chơi thử" : "Nông trại của " + (u ? u.name : "bé");
     var nx = L.next, pct = nx ? Math.min(100, Math.round((L.learn - L.at) / (nx.at - L.at) * 100)) : 100;
     $("lvl").innerHTML = "<b>Cấp " + L.n + " · " + esc(L.name) + '</b><div class="bar"><i style="width:' + pct + '%"></i></div><span style="font-size:18px">' +
       (nx ? L.learn + " / " + nx.at + " sao học → Cấp " + nx.n : "Cấp cao nhất rồi!") + "</span>";
@@ -482,14 +482,30 @@
   });
 
   /* ---------- vẽ lại ---------- */
-  function all() { header(); calendar(); classTree(); news(); draw(); tools(); shop(); }
+  var lastW = "";
+  function all() {
+    header(); calendar(); classTree(); news(); draw(); tools(); shop();
+    var wn = F.weatherOf(F.today()); if (wn !== lastW) { lastW = wn; animate(); }
+  }
+  /* cho phần "Chơi thử": vị trí trên màn hình của một ô đất / con vật trong cảnh */
+  window.FarmUI = {
+    rect: function (match) {
+      var r = cv.getBoundingClientRect();
+      for (var i = 0; i < hits.length; i++) {
+        var h = hits[i]; if (!match(h)) continue;
+        return { left: r.left + h.x / W * r.width, top: r.top + h.y / H * r.height, width: h.w / W * r.width, height: h.h / H * r.height };
+      }
+      return null;
+    },
+    closeCard: function () { closeCard(); }
+  };
   var u = LC.user();
   if (!u) return;            // màn đăng nhập của lc-track sẽ hiện
   F.init(u);
   F.on(all);
   document.body.style.backgroundImage = "url(" + PX.tile(64, 64, 4, "#6fbf5b", "#62b04f", "#7dcc68") + ")";
   document.body.style.backgroundSize = "256px 256px";
-  PX.loadAtlas().then(function () { all(); animate(); F.sync(); });
+  PX.loadAtlas().then(function () { all(); F.sync(); });
   var rzT = 0; addEventListener("resize", function () { clearTimeout(rzT); rzT = setTimeout(function () { calendar(); if (pickLayout()) draw(); }, 200); });
   document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") { F.refresh(); F.sync(); } });
   setInterval(function () { var d = F.today(); if (d !== window.__day) { window.__day = d; F.refresh(); animate(); } }, 60000); window.__day = F.today();

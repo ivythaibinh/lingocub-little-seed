@@ -141,6 +141,25 @@
   .gd-ft{display:flex;justify-content:space-between;gap:10px}
   .gd-b{font-size:24px;padding:4px 14px}
   .gd-off{display:block;margin:12px auto 2px;border:0;background:none;font-size:19px;color:var(--mute);text-decoration:underline;cursor:pointer}
+  /* Chơi thử */
+  .co-card{position:fixed;z-index:97;top:max(8px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:min(440px,calc(100vw - 16px));padding:8px 12px 10px;background:#fff8d6}
+  .co-hd{display:flex;align-items:center;gap:6px;font-size:19px;color:var(--orange-d)}
+  .co-x{margin-left:auto;border:0;background:none;font-size:20px;cursor:pointer;color:var(--ink);text-decoration:underline}
+  .co-tx{font-size:22px;line-height:1.2;margin:4px 0 6px}
+  .co-tx b{font-weight:400;color:var(--orange-d)}
+  .co-ft{display:flex;justify-content:flex-end}
+  .co-go{font-size:24px;padding:4px 16px}
+  .co-skip{border:0;background:none;font-size:18px;color:var(--mute);cursor:pointer;text-decoration:underline}
+  .co-ring{position:fixed;z-index:96;pointer-events:none;outline:4px solid var(--yellow);box-shadow:0 0 0 4px var(--ink);animation:pulse 1s infinite}
+  @keyframes pulse{50%{outline-color:#fff;outline-offset:3px}}
+  .co-arrow{position:fixed;z-index:96;pointer-events:none;width:36px;height:38px;animation:bounce .7s infinite alternate;
+    filter:drop-shadow(3px 0 0 #2e2238) drop-shadow(-3px 0 0 #2e2238) drop-shadow(0 3px 0 #2e2238) drop-shadow(0 -3px 0 #2e2238)}
+  .co-arrow::before{content:"";position:absolute;left:11px;top:0;width:14px;height:19px;background:var(--yellow)}
+  .co-arrow::after{content:"";position:absolute;left:0;top:18px;border-left:18px solid transparent;border-right:18px solid transparent;border-top:18px solid var(--yellow)}
+  .co-arrow.up{transform:rotate(180deg);animation:bounceup .7s infinite alternate}
+  @keyframes bounce{to{margin-top:8px}}
+  @keyframes bounceup{to{margin-top:-8px}}
+  body.demo .farmbox{box-shadow:0 0 0 4px var(--orange),0 0 0 8px var(--ink)}
   /* điện thoại: thời tiết → nông trại → khu đổi sao → lịch tuần → cây lớp, để bé thấy nông trại ngay */
   @media (max-width:600px){
     .main{display:flex;flex-direction:column;gap:22px;padding:16px 12px 0}
@@ -172,7 +191,7 @@
   <a class="btn back" href="../">◀ Trang chủ</a>
   <img class="lg" src="../assets/pixel/logo.webp" alt="Lingo Cub">
   <h1 id="title">Nông trại của bé</h1>
-  <div class="hbtns"><button class="btn hb" type="button" id="musicBtn">Nhạc</button><button class="btn hb" type="button" id="helpBtn" title="Xem hướng dẫn" aria-label="Xem hướng dẫn">?</button></div>
+  <div class="hbtns"><button class="btn hb" type="button" id="musicBtn">Nhạc</button><button class="btn hb" type="button" id="demoBtn" title="Chơi thử trên nông trại mẫu" style="background:var(--orange)">Chơi thử</button><button class="btn hb" type="button" id="helpBtn" title="Xem hướng dẫn" aria-label="Xem hướng dẫn">?</button></div>
   <div class="lvl pxf" id="lvl"></div>
   <div class="stars pxf" id="stars"></div>
 </header>

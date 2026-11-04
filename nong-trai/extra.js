@@ -40,7 +40,7 @@
     { sel: ["shop"], html: function () { return I("cart") + " <b>Khu đổi sao</b>: chọn mục ở trên (Hạt giống, Con vật, Cây ăn quả…), bấm <b>Đổi</b> để lấy đồ. Chạm vào món để nghe tên.<br>Hạt mua về nằm trong kho, chạm ô đất trống để trồng."; } },
     { sel: ["cal"], html: function () { return "<b>Lịch tuần.</b> Ngày bé học có " + I("seedling") + ", ngày nghỉ có " + I("zzz") + ". Ô viền vàng là hôm nay, 2 ô xanh là dự báo.<br>Học <b>3 ngày</b> được 3 túi phân bón, học <b>5 ngày</b> được hạt giống đặc biệt. Bấm vào ô quà để nhận."; } },
     { sel: ["cls"], html: function () { return I("tree") + " <b>Cây Đại Thụ của lớp.</b> Cả lớp cùng học đủ sao và đủ ngày trong tuần thì cây nở hoa, mỗi bạn nhận một món quà hiếm."; } },
-    { sel: ["musicBtn", "helpBtn"], last: true, html: function () { return "Bấm nút " + I("speaker") + " <b>Nhạc</b> để tắt hoặc bật nhạc.<br>Muốn xem lại hướng dẫn, bấm nút <b>?</b>.<br><b>Chúc bé chơi vui!</b>"; } }
+    { sel: ["musicBtn", "helpBtn", "demoBtn"], last: true, html: function () { return "Bấm nút " + I("speaker") + " <b>Nhạc</b> để tắt hoặc bật nhạc. Bấm <b>?</b> để xem lại hướng dẫn.<br>Bấm <b>Chơi thử</b> để tập gieo hạt, thu hoạch, chăm thú trên <b>nông trại mẫu</b> (không mất sao thật)."; } }
   ];
   var order = [], idx = 0, ov, hole, cardEl, raf = 0, until = 0;
 
@@ -85,7 +85,8 @@
       '<div class="gd-hd"><img src="../assets/pixel/lion-mc.webp" alt=""><span>Hướng dẫn · ' + (idx + 1) + "/" + order.length + '</span><button type="button" class="gd-x" data-g="x" aria-label="Đóng">✕</button></div>' +
       '<div class="gd-tx">' + st.html() + "</div>" +
       '<div class="gd-ft">' + (idx ? '<button type="button" class="btn gd-b" data-g="prev" style="background:var(--blue)">◀ Quay lại</button>' : "<span></span>") +
-      '<button type="button" class="btn gd-b" data-g="' + (last ? "end" : "next") + '">' + (last ? "Bắt đầu chơi!" : "Tiếp ▶") + "</button></div>" +
+      (last ? '<button type="button" class="btn gd-b" data-g="demo" style="background:var(--orange)">Chơi thử ▶</button>' : "") +
+      '<button type="button" class="btn gd-b" data-g="' + (last ? "end" : "next") + '">' + (last ? "Vào nông trại" : "Tiếp ▶") + "</button></div>" +
       '<button type="button" class="gd-off" data-g="off">Không hiện lại lần sau</button>';
     if (!st.center) {
       var es = els(st);
@@ -114,6 +115,7 @@
       var g = b.getAttribute("data-g");
       if (g === "x" || g === "end") close(false);
       else if (g === "off") close(true);
+      else if (g === "demo") startPractice();
       else if (g === "next") show(idx + 1);
       else if (g === "prev") show(idx - 1);
     });
@@ -131,8 +133,97 @@
       paint();
     };
     if (hb) hb.onclick = function () { open(0); };
+    var db = $("demoBtn"); if (db) { db.innerHTML = PX.icon("seedling", 18, 1) + "<span>Chơi thử</span>"; db.onclick = function () { if (co) endPractice(); else startPractice(); }; }
     play();
     if (get(GKEY) !== "1") setTimeout(function () { open(0); }, 500);
   });
-  window.FarmGuide = { open: open, close: close, music: music };
+  /* ---------- Chơi thử: tập trồng cây, thu hoạch, chăm thú trên nông trại mẫu ---------- */
+  var F = window.FarmCore;
+  function plotHit(slot) { return function () { return window.FarmUI && FarmUI.rect(function (h) { return h.kind === "plot" && h.slot === slot; }); }; }
+  function animalHit(id) { return function () { return window.FarmUI && FarmUI.rect(function (h) { return h.kind === "animal" && h.id === id; }); }; }
+  function domHit(sel) { return function () { var e = document.querySelector(sel); return e && e.offsetParent !== null ? e.getBoundingClientRect() : null; }; }
+  function btnWith(txt) { return function () { var bs = document.querySelectorAll("#ov [data-act], #ov [data-opt]"); for (var i = 0; i < bs.length; i++) if (bs[i].textContent.indexOf(txt) >= 0) return bs[i].getBoundingClientRect(); return null; }; }
+  function T() { return F.today(); }
+  var LESSON = [
+    { intro: true, html: "<b>Cùng chơi thử nhé!</b><br>Đây là <b>nông trại mẫu</b>, bé có 100 sao để tập. Làm theo mũi tên chỉ nhé.<br>Chơi thử không làm thay đổi nông trại thật của bé.", btn: "Bắt đầu ▶" },
+    { html: "<b>Gieo hạt:</b> chạm vào <b>ô đất trống</b> có mũi tên.", card: "Chọn hạt <b>Cà rốt</b> để gieo nhé!", at: plotHit("S0"), inCard: btnWith("Cà rốt"), done: function (st) { return !!st.field.S0; } },
+    { html: "<b>Thu hoạch:</b> cà rốt này đã lớn, có " + "✨" + " lấp lánh. Chạm vào cà rốt.", card: "Bấm nút <b>Thu hoạch</b>.", at: plotHit("S1"), inCard: btnWith("Thu hoạch"), done: function (st) { return !st.field.S1; } },
+    { html: "<b>Bón phân:</b> khoai tây vừa gieo hôm nay. Chạm vào ô khoai tây.", card: "Bấm <b>Bón phân</b> cho cây lớn nhanh hơn.", at: plotHit("S2"), inCard: btnWith("Bón phân"), done: function (st) { return st.field.S2 && st.field.S2.f >= 1; } },
+    { html: "<b>Hái quả:</b> cây táo có quả chín rồi. Chạm vào cây táo.", card: "Bấm <b>Hái Táo</b>.", at: plotHit("L0"), inCard: btnWith("Hái"), done: function (st) { return (st.kho.apple || 0) > 0; } },
+    { html: "<b>Lấy trứng:</b> chạm vào <b>bạn gà</b>.", card: "Bấm <b>Lấy Trứng gà</b>.", at: animalHit("chicken"), inCard: btnWith("Lấy"), done: function (st) { return !!(st.got[T()] && st.got[T()].chicken); } },
+    { html: "<b>Cho thú ăn:</b> bạn thỏ thích cà rốt. Chạm vào <b>bạn thỏ</b>.", card: "Bấm <b>Cho ăn Cà rốt</b>.", at: animalHit("rabbit"), inCard: btnWith("Cho ăn"), done: function (st) { return !!(st.fed[T()] && st.fed[T()].rabbit); } },
+    { html: "<b>Bán ở chợ:</b> bấm nút <b>Kho</b>.", card: "Bấm <b>Bán 1</b> ở dòng Trứng gà để lấy thêm sao.", at: domHit("#tKho"), inCard: domHit('#ov [data-sell="egg"][data-n="1"]'), done: function (st) { return (st.sale[T()] || 0) > 0; } },
+    { html: "<b>Đổi sao:</b> ở Khu đổi sao, bấm <b>Đổi</b> để lấy hạt Cà chua.", at: domHit('[data-buy="tomato"]'), start: function () { var t = document.querySelector('[data-tab="seed"]'); if (t && !t.classList.contains("on")) t.click(); }, done: function (st) { return (st.seeds.tomato || 0) > 0; } },
+    { html: "<b>Trời mưa rồi!</b> Bấm <b>Dựng đồ che</b> để che ruộng và mặc áo mưa cho các bạn thú.", at: domHit("[data-deploy]"), start: function () { F.setDemoWeather("rainy"); }, done: function (st) { return !!st.deploy[T()]; } },
+    { end: true, html: "<b>Bé giỏi quá!</b> Bé đã biết gieo hạt, thu hoạch, bón phân, hái quả, lấy trứng, cho thú ăn, bán hàng và che mưa.<br>Giờ về nông trại thật, học bài để kiếm sao nhé!", btn: "Về nông trại của bé" }
+  ];
+  var co = null, li = 0, coT = 0, praised = false;
+  function coDraw() {
+    if (!co) return;
+    var stp = LESSON[li], cardOpen = !!document.getElementById("ov"), r = null;
+    if (!stp.intro && !stp.end) r = cardOpen ? (stp.inCard ? stp.inCard() : null) : (stp.at ? stp.at() : null);
+    var tx = co.querySelector(".co-tx"), want = cardOpen && stp.card ? stp.card : stp.html;
+    if (tx.getAttribute("data-h") !== want && !praised) { tx.innerHTML = want; tx.setAttribute("data-h", want); }
+    var ring = co.querySelector(".co-ring"), arr = co.querySelector(".co-arrow");
+    if (r && r.width) {
+      ring.hidden = arr.hidden = false;
+      ring.style.cssText = "left:" + (r.left - 6) + "px;top:" + (r.top - 6) + "px;width:" + (r.width + 12) + "px;height:" + (r.height + 12) + "px";
+      var below = r.top < 150;
+      arr.className = "co-arrow" + (below ? " up" : "");
+      arr.style.left = (r.left + r.width / 2 - 18) + "px"; arr.style.top = (below ? r.bottom + 8 : r.top - 46) + "px";
+    } else { ring.hidden = arr.hidden = true; }
+  }
+  function coCheck() {
+    if (!co || praised) return;
+    var stp = LESSON[li];
+    if (stp.done && stp.done(F.state())) {
+      praised = true;
+      var tx = co.querySelector(".co-tx"); tx.innerHTML = "<b>Giỏi lắm!</b> ✓"; tx.removeAttribute("data-h");
+      setTimeout(function () { praised = false; coShow(li + 1); }, 1300);
+    }
+    coDraw();
+  }
+  function coShow(i) {
+    li = Math.min(i, LESSON.length - 1);
+    var stp = LESSON[li], n = LESSON.length - 2, k = li;
+    co.querySelector(".co-hd span").textContent = stp.intro ? "CHƠI THỬ" : stp.end ? "CHƠI THỬ · Hoàn thành!" : "CHƠI THỬ · bước " + k + "/" + n;
+    var tx = co.querySelector(".co-tx"); tx.innerHTML = stp.html; tx.setAttribute("data-h", stp.html);
+    co.querySelector(".co-ft").innerHTML = stp.btn ? '<button type="button" class="btn co-go" data-c="' + (stp.end ? "exit" : "next") + '">' + stp.btn + "</button>" :
+      '<button type="button" class="co-skip" data-c="next">Bỏ qua bước này ▸</button>';
+    if (li > 0 && window.FarmUI) FarmUI.closeCard();
+    if (stp.start) stp.start();
+    setTimeout(function () {
+      var r = stp.at && stp.at();
+      if (r) { var y = r.top + scrollY - innerHeight / 2 + r.height / 2; try { scrollTo({ top: Math.max(0, y), behavior: "smooth" }); } catch (e) { scrollTo(0, y); } }
+    }, 60);
+    coDraw();
+  }
+  function startPractice() {
+    close(false);
+    if (co) return;
+    if (window.FarmUI) FarmUI.closeCard();
+    F.startDemo(); document.body.classList.add("demo");
+    co = document.createElement("div"); co.className = "co";
+    co.innerHTML = '<div class="co-ring" hidden></div><div class="co-arrow" hidden></div>' +
+      '<div class="co-card pxf" role="dialog" aria-label="Chơi thử"><div class="co-hd">' + PX.icon("seedling", 18, 1) + '<span></span><button type="button" class="co-x" data-c="exit">Thoát ✕</button></div><div class="co-tx"></div><div class="co-ft"></div></div>';
+    document.body.appendChild(co);
+    co.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-c]"); if (!b) return;
+      if (b.getAttribute("data-c") === "exit") endPractice(); else coShow(li + 1);
+    });
+    coT = setInterval(coCheck, 250);
+    addEventListener("scroll", coDraw, { passive: true }); addEventListener("resize", coDraw);
+    coShow(0);
+  }
+  function endPractice() {
+    if (!co) return;
+    clearInterval(coT); co.remove(); co = null;
+    removeEventListener("scroll", coDraw); removeEventListener("resize", coDraw);
+    if (window.FarmUI) FarmUI.closeCard();
+    document.body.classList.remove("demo");
+    F.endDemo();
+    scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  window.FarmGuide = { open: open, close: close, music: music, practice: startPractice, endPractice: endPractice };
 })();

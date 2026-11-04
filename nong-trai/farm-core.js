@@ -37,7 +37,12 @@
   }
   /* xem thử một kiểu thời tiết cho hôm nay: thêm ?thoitiet=rainy (sunny, cloudy, rainbow, rainy, windy, stormy, hot, cold, snowy, foggy) vào địa chỉ */
   var TRY = (function () { try { var m = location.search.match(/[?&]thoitiet=([a-z]+)/); return m && D.WEATHER[m[1]] ? m[1] : ""; } catch (e) { return ""; } })();
-  function weatherOf(day) { if (TRY && day === today()) return TRY; return weekWeather(monday(day))[diff(monday(day), day)]; }
+  var demo = false, realSt = null, demoW = "", demoLedger = null;   // chế độ "Chơi thử" (nông trại mẫu, không lưu)
+  function weatherOf(day) {
+    if (demo && day === today()) return demoW || "sunny";
+    if (TRY && day === today()) return TRY;
+    return weekWeather(monday(day))[diff(monday(day), day)];
+  }
   function isBad(day) { return !D.WEATHER[weatherOf(day)].good; }
 
   /* ---------- trạng thái ---------- */
@@ -57,14 +62,15 @@
   }
   var saveT = 0;
   function save() {
+    if (demo) { emit(); return; }
     st.t = Date.now(); prune();
     try { localStorage.setItem(key(), JSON.stringify(st)); } catch (e) {}
     clearTimeout(saveT); saveT = setTimeout(push, 1500);
     emit();
   }
   function push() {
-    clearTimeout(saveT);
-    if (!window.LC || !LC.api || !uid) return;
+    clearTimeout(saveT); saveT = 0;
+    if (demo || !window.LC || !LC.api || !uid) return;
     LC.post({ action: "farmSave", id: uid, name: uname, state: st }, 15000).then(function (j) {
       if (j && j.stale && j.state && Number(j.state.t) > st.t) { st = j.state; localStorage.setItem(key(), JSON.stringify(st)); emit(); }
     }).catch(function () {});
@@ -73,6 +79,7 @@
 
   /* ---------- sao ---------- */
   function ledger() {
+    if (demo) return demoLedger;
     var a = (window.LC && LC.ledger) ? LC.ledger() : { d: {}, sat: {} }, b = (server && server.ledger) || { d: {}, sat: {} };
     var out = { d: {}, sat: {} };
     [a, b].forEach(function (L) {
@@ -328,15 +335,37 @@
       if (!j || !j.ok) return false;
       server = { ledger: j.ledger, cls: j.cls || null }; cls = j.cls || null;
       try { localStorage.setItem(key() + ":srv", JSON.stringify(server)); } catch (e) {}
-      if (j.state && Number(j.state.t) > Number(st.t)) { st = j.state; try { localStorage.setItem(key(), JSON.stringify(st)); } catch (e) {} }
-      else if (Number(st.t) > Number(j.state ? j.state.t : 0)) push();
+      var mine = demo ? realSt : st;
+      if (j.state && Number(j.state.t) > Number(mine.t)) { if (demo) realSt = j.state; else st = j.state; try { localStorage.setItem(key(), JSON.stringify(j.state)); } catch (e) {} }
+      else if (!demo && Number(st.t) > Number(j.state ? j.state.t : 0)) push();
       invalidate(); emit(); return true;
     }).catch(function () { return false; });
   }
   window.addEventListener("pagehide", function () { if (saveT) push(); });
   window.addEventListener("storage", function (e) { if (e.key && e.key.indexOf("lc-stars:") === 0) { invalidate(); emit(); } });
 
+  /* ---------- Chơi thử: nông trại mẫu để bé tập trồng, thu hoạch, chăm thú ---------- */
+  function startDemo() {
+    if (demo) return;
+    if (saveT) push();
+    var t = today(), ago = function (n) { return addDays(t, -n); }, L = { d: {}, sat: {} };
+    for (var i = 0; i <= 10; i++) L.d[ago(i)] = { "0|demo|Chơi thử": 30 };
+    demoLedger = L; realSt = st; demo = true; demoW = "sunny";
+    st = { v: 1, t: Date.now(), spent: 230, sale: {}, saleAll: 0, seeds: { carrot: 1 }, nursery: {}, kho: { egg: 1 }, fert: 2,
+      plots: { S: 4, M: 1, L: 1 }, field: { S1: { c: "carrot", p: ago(3) }, S2: { c: "potato", p: t }, M0: { c: "corn", p: ago(1) }, L0: { c: "appletree", p: ago(8) } },
+      animals: { chicken: 1, rabbit: 1, dog: 1 }, fed: {}, got: {}, tools: { wateringcan: 1, shovel: 1, raincoat: 1, shelter: 1, scarecrow: 1 },
+      builds: { pond: 1 }, decor: ["flower", "flower"], deploy: {}, wk: {}, cc: {}, lvSeen: 99, welcome: t };
+    invalidate(); emit();
+  }
+  function endDemo() {
+    if (!demo) return;
+    st = realSt; realSt = null; demo = false; demoW = ""; demoLedger = null;
+    invalidate(); emit();
+  }
+  function setDemoWeather(w) { if (demo && D.WEATHER[w]) { demoW = w; invalidate(); emit(); } }
+
   window.FarmCore = {
+    startDemo: startDemo, endDemo: endDemo, setDemoWeather: setDemoWeather, isDemo: function () { return demo; },
     D: D, BY: BY, today: today, addDays: addDays, monday: monday, diff: diff, weekDays: weekDays,
     weatherOf: weatherOf, isBad: isBad, init: init, sync: sync, on: function (f) { listeners.push(f); },
     state: function () { return st; }, cls: function () { return cls; }, stars: stars, level: level, played: played,
