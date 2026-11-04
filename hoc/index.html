@@ -12,7 +12,7 @@
 <script src="../nong-trai/img/atlas.js"></script>
 <script src="units.js"></script>
 <style>
-:root{color-scheme:light;--col:min(100vw,540px);--grass:#8fd46c;--wood:#c98c4c;--wood-d:#8f5a2c}
+:root{color-scheme:light;--col:min(100vw,540px,max(360px,calc((100vh - 170px) * .606)));--grass:#8fd46c;--wood:#c98c4c;--wood-d:#8f5a2c}
 html{scroll-behavior:auto}
 body{background:#4f9a40;background-image:linear-gradient(90deg,rgba(0,0,0,.06) 50%,transparent 50%),linear-gradient(rgba(0,0,0,.05) 50%,transparent 50%);background-size:16px 16px;min-height:100vh;padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 img{-webkit-user-drag:none;user-select:none}
@@ -35,7 +35,7 @@ img{-webkit-user-drag:none;user-select:none}
 .tmode a{color:#ffd43b}
 
 /* bản đồ */
-.map{width:var(--col);margin:0 auto;position:relative;box-shadow:-4px 0 0 var(--ink),4px 0 0 var(--ink),-10px 0 0 rgba(46,34,56,.18),10px 0 0 rgba(46,34,56,.18)}
+.map{width:var(--col);margin:0 auto;position:relative;container-type:inline-size;box-shadow:-4px 0 0 var(--ink),4px 0 0 var(--ink),-10px 0 0 rgba(46,34,56,.18),10px 0 0 rgba(46,34,56,.18)}
 .scene{display:block;width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges}
 .unit,.cap{position:relative}
 
@@ -54,7 +54,7 @@ img{-webkit-user-drag:none;user-select:none}
 
 /* chặng */
 .stop{position:absolute;z-index:4;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px}
-.node{position:relative;width:clamp(66px,18vw,80px);aspect-ratio:1;border:0;padding:0;cursor:pointer;background:var(--ink);
+.node{position:relative;width:clamp(58px,17cqw,80px);aspect-ratio:1;border:0;padding:0;cursor:pointer;background:var(--ink);
   --cp:polygon(30% 0,70% 0,70% 5%,85% 5%,85% 15%,95% 15%,95% 30%,100% 30%,100% 70%,95% 70%,95% 85%,85% 85%,85% 95%,70% 95%,70% 100%,30% 100%,30% 95%,15% 95%,15% 85%,5% 85%,5% 70%,0 70%,0 30%,5% 30%,5% 15%,15% 15%,15% 5%,30% 5%);
   clip-path:var(--cp);-webkit-clip-path:var(--cp);transition:transform .1s}
 .node:active{transform:translateY(3px)}
@@ -66,11 +66,13 @@ img{-webkit-user-drag:none;user-select:none}
 .stop.locked .num{color:#8f877d;text-shadow:none}
 .stop.open .node{--nc:var(--green)}
 .stop.cur .node{--nc:var(--orange)}
+.stop.w.open .node{--nc:var(--blue)}
+.sh-ic{flex:none;width:84px;display:grid;place-items:center;margin-top:-6px}
 .stop.done .node{--nc:var(--yellow)}
 .tag{font-size:19px;line-height:1;padding:2px 8px 3px;background:#fff4d8;color:var(--ink);white-space:nowrap;box-shadow:0 -2px 0 var(--ink),0 2px 0 var(--ink),-2px 0 0 var(--ink),2px 0 0 var(--ink),0 5px 0 rgba(46,34,56,.3)}
 .stop.locked .tag{background:#e7e1d6;color:#8f877d}
 .stop.cur .tag{background:var(--orange);color:#fff}
-.stop.cur::before{content:"";position:absolute;left:50%;top:0;width:clamp(66px,18vw,80px);aspect-ratio:1;transform:translateX(-50%);background:rgba(255,212,59,.75);
+.stop.cur::before{content:"";position:absolute;left:50%;top:0;width:clamp(58px,17cqw,80px);aspect-ratio:1;transform:translateX(-50%);background:rgba(255,212,59,.75);
   clip-path:polygon(30% 0,70% 0,70% 5%,85% 5%,85% 15%,95% 15%,95% 30%,100% 30%,100% 70%,95% 70%,95% 85%,85% 85%,85% 95%,70% 95%,70% 100%,30% 100%,30% 95%,15% 95%,15% 85%,5% 85%,5% 70%,0 70%,0 30%,5% 30%,5% 15%,15% 15%,15% 5%,30% 5%);animation:ring 1.4s steps(6) infinite;z-index:-1}
 @keyframes ring{0%{transform:translateX(-50%) scale(1);opacity:.9}100%{transform:translateX(-50%) scale(1.55);opacity:0}}
 .bub{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;font-size:24px;letter-spacing:.06em;line-height:1;padding:6px 10px;background:#fff;color:var(--orange-d);
@@ -83,7 +85,7 @@ img{-webkit-user-drag:none;user-select:none}
 @keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
 
 /* nhân vật */
-.who{position:absolute;z-index:3;height:clamp(84px,24vw,112px);width:auto;transform:translate(-50%,-58%);pointer-events:none;filter:drop-shadow(0 4px 0 rgba(46,34,56,.3));transition:filter .3s,opacity .3s}
+.who{position:absolute;z-index:3;height:clamp(72px,21cqw,112px);width:auto;transform:translate(-50%,-58%);pointer-events:none;filter:drop-shadow(0 4px 0 rgba(46,34,56,.3));transition:filter .3s,opacity .3s}
 .who.off{filter:grayscale(1) drop-shadow(0 4px 0 rgba(46,34,56,.2));opacity:.55}
 .who.hop{animation:hop 1.2s steps(3) infinite}
 @keyframes hop{50%{transform:translate(-50%,-64%)}}
@@ -180,13 +182,14 @@ img{-webkit-user-drag:none;user-select:none}
 "use strict";
 const UNITS = window.LC_UNITS || [], P = window.LCPATH, A = window.FARM_ATLAS;
 const $ = id => document.getElementById(id);
-const WHO = ["bunny","leo","xiaobao","buffy"];               // nhân vật của Chặng 1 → 4
-const TAG = ["Hát & Từ 1","Từ vựng 2","Truyện","Luyện tập"];
-const TITLE = ["Hát & học từ mới","Từ vựng · Bài 2","Nghe truyện","Chơi luyện tập"];
-const SUB = ["Warm-up & Vocabulary 1","Vocabulary 2","Story","Practice"];
+const WHO = [null,"bunny","leo","xiaobao","buffy"];          // Khởi động không có nhân vật; Bài 1 → 4: Bunny, Leo, Xiaobao, Buffy
+const TAG = ["♪ Khởi động","Bài 1 · Từ vựng","Bài 2 · Từ vựng","Bài 3 · Truyện","Bài 4 · Thực hành"];
+const TITLE = ["Khởi động","Bài 1 · Từ vựng","Bài 2 · Từ vựng","Bài 3 · Truyện","Bài 4 · Thực hành"];
+const SUB = ["Warm-up · hát cùng các bạn","Vocabulary 1","Vocabulary 2","Story","Practice"];
+const NS = 5;
 const ICON = {"warm-up":"speaker","vocab-1":"books","vocab-2":"books","story":"sparkles","practice":"gift","sat":"glowing_star"};
-const W = 160, H = 240, PTS = [[52,205],[106,155],[54,105],[106,55]], MID = 79;
-const WHOX = [124,34,124,34];
+const W = 160, H = 264, PTS = [[52,238],[106,194],[54,150],[106,106],[52,62]], MID = 79;
+const WHOX = [0,30,128,30,128];
 
 /* ---------- hình từ bộ sprite ---------- */
 const sheets = {};
@@ -235,7 +238,7 @@ function drawUnit(cv, U){
   grass(c, W, H, U.n * 977);
   road(c, [[MID,H+24],[MID,H],...PTS,[MID,0],[MID,-24]], U.n);
   const d = U.deco || [];
-  [[17,214,"tree",32],[142,168,d[0],24],[16,118,d[1],24],[142,70,"tree",32]].forEach(([x,y,n,s]) => { if(!n) return; shadow(c, x, y, s === 32 ? 22 : 18); spr(c, n, s, x, y); });
+  [[138,254,d[0],24],[16,164,d[1],24],[146,120,"tree",32],[16,76,"tree",32]].forEach(([x,y,n,s]) => { if(!n) return; shadow(c, x, y, s === 32 ? 22 : 18); spr(c, n, s, x, y); });
 }
 function drawCap(cv, top){
   const h = top ? 150 : 110, c = ctx(cv, W, h);
@@ -275,15 +278,15 @@ function build(){
     sec.className = "unit c" + ((U.n - 1) % 4); sec.id = "unit-" + U.n;
     let h = '<canvas class="scene" width="'+W+'" height="'+H+'"></canvas>' +
       '<div class="ubar pxf"><span class="un">UNIT<b>' + U.n + '</b></span><span class="ut"><b>' + esc(U.en) + '</b><small>' + esc(U.vi) + ' · <span class="zh">' + U.zh + '</span></small></span><span class="up" data-up></span></div>';
-    for(let s = 0; s < 4; s++){
-      h += '<img class="who" src="../assets/pixel/farmer-' + WHO[s] + '.webp" alt="" style="' + pct(WHOX[s], PTS[s][1]) + '" data-who="' + U.n + '-' + s + '">';
-      h += '<div class="stop" style="' + pct(PTS[s][0], PTS[s][1]) + '" data-stop="' + U.n + '-' + s + '"><button class="node" type="button" aria-label="Unit ' + U.n + ' chặng ' + (s+1) + '"><span class="f"></span></button><span class="tag">' + (s+1) + ' · ' + TAG[s] + '</span></div>';
+    for(let s = 0; s < NS; s++){
+      if(WHO[s]) h += '<img class="who" src="../assets/pixel/farmer-' + WHO[s] + '.webp" alt="" style="' + pct(WHOX[s], PTS[s][1]) + '" data-who="' + U.n + '-' + s + '">';
+      h += '<div class="stop" style="' + pct(PTS[s][0], PTS[s][1]) + '" data-stop="' + U.n + '-' + s + '"><button class="node" type="button" aria-label="Unit ' + U.n + ' · ' + TITLE[s] + '"><span class="f"></span></button><span class="tag">' + TAG[s] + '</span></div>';
     }
     sec.innerHTML = h;
     map.appendChild(sec);
     drawUnit(sec.querySelector("canvas"), U);
     BARS[U.n] = sec;
-    for(let s = 0; s < 4; s++){
+    for(let s = 0; s < NS; s++){
       NODES[U.n + "-" + s] = sec.querySelector('[data-stop="' + U.n + '-' + s + '"]');
       WHOS[U.n + "-" + s] = sec.querySelector('[data-who="' + U.n + '-' + s + '"]');
       NODES[U.n + "-" + s].querySelector(".node").addEventListener("click", () => tap(U.n, s));
@@ -305,25 +308,24 @@ function paint(){
   S.units.forEach(u => {
     const sec = BARS[u.n]; if(!sec) return;
     sec.classList.toggle("locked", !u.open);
-    const nd = u.stages.filter(s => s.done).length;
+    const nd = u.stages.slice(1).filter(s => s.done).length;
     sec.querySelector("[data-up]").innerHTML = !u.open ? icon("locked", 24, 1) : (u.done || nd === 4) ? icon("trophy", 24, 1) : icon("star", 24, 1) + nd + "/4";
     u.stages.forEach((st, s) => {
-      const el = NODES[u.n + "-" + s], cur = S.cur.u === u.n && S.cur.s === s + 1 && !S.cur.all;
-      el.className = "stop " + (!st.open ? "locked" : st.done ? "done" : cur ? "cur" : "open");
+      const el = NODES[u.n + "-" + s], cur = S.cur.u === u.n && S.cur.s === s && !S.cur.all;
+      el.className = "stop " + (s === 0 ? "w " : "") + (!st.open ? "locked" : st.done ? "done" : cur ? "cur" : "open");
       const f = el.querySelector(".f");
-      f.innerHTML = !st.open ? icon("locked", 24, 1.4) : st.done ? icon("star", 24, 1.5) + '<span class="mini">' + (s+1) + '</span>' : '<span class="num">' + (s+1) + '</span>';
+      f.innerHTML = !st.open ? icon("locked", 24, 1.4) : st.done ? icon("star", 24, 1.5) + '<span class="mini">' + (s || "♪") + '</span>' : s === 0 ? icon("speaker", 24, 1.6) : '<span class="num">' + s + '</span>';
       let b = el.querySelector(".bub");
       if(cur && !b){ b = document.createElement("span"); b.className = "bub"; b.textContent = "BẮT ĐẦU"; el.prepend(b); }
       if(!cur && b) b.remove();
       const w = WHOS[u.n + "-" + s];
-      w.classList.toggle("off", !st.open);
-      w.classList.toggle("hop", cur);
+      if(w){ w.classList.toggle("off", !st.open); w.classList.toggle("hop", cur); }
     });
   });
-  const cu = S.units[S.cur.u - 1], n = cu ? cu.stages.filter(s => s.done).length : 0;
+  const cu = S.units[S.cur.u - 1], n = cu ? cu.stages.slice(1).filter(s => s.done).length : 0;
   $("barFill").style.width = (n / 4 * 100) + "%";
-  $("barTxt").textContent = "Unit " + S.cur.u + " · " + n + "/4 chặng";
-  $("goTxt").textContent = S.cur.all ? "Xong cả 12 Unit!" : "Unit " + S.cur.u + " · Chặng " + S.cur.s;
+  $("barTxt").textContent = "Unit " + S.cur.u + " · " + n + "/4 bài";
+  $("goTxt").textContent = S.cur.all ? "Xong cả 12 Unit!" : "Unit " + S.cur.u + " · " + (S.cur.s ? "Bài " + S.cur.s : "Khởi động");
   $("tmode").hidden = !S.teacher;
   revBtn();
 }
@@ -335,7 +337,7 @@ function tap(n, s){
   const u = S.units[n - 1], st = u.stages[s], el = NODES[n + "-" + s];
   if(!st.open){
     el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake");
-    const prev = s > 0 ? "Chặng " + s + " của Unit " + n : "Unit " + (n - 1);
+    const prev = s > 1 ? "Bài " + (s - 1) + " của Unit " + n : "Unit " + (n - 1);
     toast("🔒 Con học xong " + prev + " trước nhé!");
     return;
   }
@@ -344,14 +346,14 @@ function tap(n, s){
 function openSheet(n, s){
   const U = UNITS[n - 1], u = S.units[n - 1], st = U.stages[s];
   const lines = st.lines.filter(Boolean).map(l => /[一-鿿]/.test(l) ? '<span class="zh">' + esc(l) + '</span>' : esc(l)).join("<br>");
-  let h = '<div class="sh-h"><img src="../assets/pixel/farmer-' + WHO[s] + '.webp" alt=""><div><span class="chip">UNIT ' + n + ' · CHẶNG ' + (s+1) + '</span><h3>' + TITLE[s] + '<small>' + SUB[s] + '</small></h3><p>' + lines + '</p></div><button class="x" type="button" data-x aria-label="Đóng">X</button></div><div class="items">';
+  let h = '<div class="sh-h">' + (WHO[s] ? '<img src="../assets/pixel/farmer-' + WHO[s] + '.webp" alt="">' : '<span class="sh-ic">' + icon("speaker", 32, 2.2) + '</span>') + '<div><span class="chip">UNIT ' + n + ' · ' + (s ? "BÀI " + s : "KHỞI ĐỘNG") + '</span><h3>' + TITLE[s] + '<small>' + SUB[s] + '</small></h3><p>' + lines + '</p></div><button class="x" type="button" data-x aria-label="Đóng">X</button></div><div class="items">';
   st.items.forEach(it => {
     const ok = u.items[it.k];
     h += '<button class="btn item' + (ok ? " ok" : "") + '" type="button" data-go="' + it.k + '">' + icon(ICON[it.k], 24, 1.5) + '<span class="t">' + it.label + '<small>' + (ok ? "Đã xong · học lại" : "Bấm để vào học") + '</small></span><span class="st">' + (ok ? "✓" : "▶") + '</span></button>';
   });
   h += '</div>';
-  const need = s === 0 ? "Xong cả hai bài thì mở Chặng 2." : s === 3 ? (n < P.LAST ? "Xong chặng này thì mở Unit " + (n + 1) + "." : "Chặng cuối của Little Seed!") : "Xong chặng này thì mở Chặng " + (s + 2) + ".";
-  h += '<p class="note">' + (n <= P.OPEN_UPTO ? "Unit ôn tập: con học lại thoải mái. " : need + " ") + 'Mỗi bài tính là xong khi con chơi hết ít nhất 1 trò' + (s === 0 ? " và hát hết ít nhất 1 bài." : ".") + '</p>';
+  const need = s === 0 ? "Không bắt buộc: con hát trước hoặc vào thẳng Bài 1 đều được." : s === 4 ? (n < P.LAST ? "Xong bài này thì mở Unit " + (n + 1) + "." : "Bài cuối của Little Seed!") : "Xong bài này thì mở Bài " + (s + 1) + ".";
+  h += '<p class="note">' + (n <= P.OPEN_UPTO ? "Unit ôn tập: con học lại thoải mái. " : need + " ") + (s === 0 ? "Hát hết ít nhất 1 bài là xong chặng." : "Bài tính là xong khi con chơi hết ít nhất 1 trò.") + '</p>';
   const sh = $("sheet"); sh.innerHTML = h;
   sh.onclick = e => {
     if(e.target.closest("[data-x]")) return closeSheet();
@@ -367,7 +369,7 @@ document.addEventListener("keydown", e => { if(e.key === "Escape"){ if(!$("ov").
 /* ---------- mở bài trong khung ---------- */
 const viewer = $("viewer"), frame = $("frame");
 function itemOf(n, k){ const U = UNITS[n - 1]; for(const st of U.stages) for(const it of st.items) if(it.k === k) return it; return null; }
-function stageIdx(k){ return k === "warm-up" || k === "vocab-1" ? 0 : k === "vocab-2" ? 1 : k === "story" ? 2 : 3; }
+function stageIdx(k){ return k === "warm-up" ? 0 : k === "vocab-1" ? 1 : k === "vocab-2" ? 2 : k === "story" ? 3 : 4; }
 function go(n, k){ location.hash = "u" + n + "/" + k; }
 function full(u){ return new URL(u, location.href).href; }
 let before = null;
@@ -376,7 +378,7 @@ function route(){
   if(it && S.units[n - 1].stages[stageIdx(k)].open){
     const key = n + "/" + k;
     if(frame.dataset.k !== key){ frame.contentWindow.location.replace(full(it.url)); frame.dataset.k = key; }
-    $("vtitle").textContent = "Unit " + n + " · Chặng " + (stageIdx(k) + 1) + " · " + it.label;
+    $("vtitle").textContent = "Unit " + n + " · " + TITLE[stageIdx(k)] + (k === "sat" ? " · Show and Tell" : "");
     $("newtab").href = full(it.url);
     if(!before) before = snapshot();
     viewer.hidden = false; document.body.style.overflow = "hidden";
@@ -403,10 +405,10 @@ function celebrate(b){
   confetti();
   if(fresh){
     const [n, s] = fresh.split("-").map(Number), el = NODES[fresh];
-    toast("🎉 Giỏi quá! Đã mở " + (s === 0 ? "Unit " + n : "Chặng " + (s + 1)) + "! 太棒了！", true);
+    toast("🎉 Giỏi quá! Đã mở " + (s <= 1 ? "Unit " + n : "Bài " + s) + "! 太棒了！", true);
     el.classList.add("pop"); setTimeout(() => el.classList.remove("pop"), 900);
     setTimeout(() => scrollToNode(el, true), 400);
-  }else toast("⭐ Xong chặng rồi! Con giỏi quá!", true);
+  }else toast("⭐ Xong rồi! Con giỏi quá!", true);
 }
 function checkSeen(){
   let old = null; try{ old = JSON.parse(localStorage.getItem(seenKey())); }catch(e){}
@@ -432,7 +434,7 @@ function scrollToNode(el, smooth){
   const r = el.getBoundingClientRect(), y = scrollY + r.top + r.height/2 - innerHeight * 0.52;
   scrollTo({top: Math.max(0, y), behavior: smooth ? "smooth" : "auto"});
 }
-function curNode(){ return NODES[S.cur.u + "-" + (S.cur.s - 1)]; }
+function curNode(){ return NODES[S.cur.u + "-" + S.cur.s]; }
 function scrollToCur(smooth){
   const el = curNode(), sec = BARS[S.cur.u], hd = document.querySelector(".top").offsetHeight + 6;
   const dock = innerHeight - document.querySelector(".dock").getBoundingClientRect().top + 16;
@@ -440,7 +442,7 @@ function scrollToCur(smooth){
   const need = scrollY + r.bottom + 40 - (innerHeight - dock);   // chặng hiện tại phải nằm trên hai nút dưới
   scrollTo({top: Math.max(0, Math.max(Math.min(top, scrollY + r.top - hd - 60), need)), behavior: smooth ? "smooth" : "auto"});
 }
-$("goNow").addEventListener("click", () => { scrollToCur(true); setTimeout(() => openSheet(S.cur.u, S.cur.s - 1), 450); });
+$("goNow").addEventListener("click", () => { scrollToCur(true); setTimeout(() => openSheet(S.cur.u, S.cur.s), 450); });
 function inReview(){ const rv = $("review"); return rv && rv.getBoundingClientRect().top < innerHeight * 0.5; }
 function revBtn(){
   const up = inReview();

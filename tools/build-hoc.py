@@ -22,7 +22,7 @@ TITLES = {
     11: ("Colors", "Màu sắc", "颜色", ["rainbow", "tulip"]),
     12: ("Counting", "Số đếm", "数一数", ["egg", "chicken"]),
 }
-LABEL = {"warm-up": "Hát khởi động", "vocab-1": "Từ vựng · Bài 1", "vocab-2": "Từ vựng · Bài 2",
+LABEL = {"warm-up": "Hát khởi động", "vocab-1": "Học từ vựng", "vocab-2": "Học từ vựng",
          "story": "Nghe truyện", "practice": "Chơi luyện tập", "sat": "Show and Tell"}
 
 
@@ -49,7 +49,8 @@ for n in sorted(TITLES):
     units.append({
         "n": n, "en": en, "vi": vi, "zh": zh, "deco": deco,
         "stages": [
-            {"items": [item("warm-up"), item("vocab-1")], "lines": [" · ".join(desc["s1"]), v1]},
+            {"items": [item("warm-up")], "lines": desc["s1"]},
+            {"items": [item("vocab-1")], "lines": [v1]},
             {"items": [item("vocab-2")], "lines": [v2]},
             {"items": [item("story")], "lines": desc["s3"]},
             {"items": [item(k) for k in keys4],

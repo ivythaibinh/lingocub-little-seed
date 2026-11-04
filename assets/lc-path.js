@@ -1,14 +1,13 @@
 /* Lingo Cub · Little Seed — luật mở khóa theo chặng (kiểu Duolingo).
    Dùng chung cho bản đồ (hoc/) và trang từng Unit (unit-N/).
 
-   Mỗi Unit có 4 chặng, mở lần lượt:
-     Chặng 1: Warm-up + Vocabulary Bài 1 (mở ngay khi sang Unit mới)
-     Chặng 2: Vocabulary Bài 2
-     Chặng 3: Story
-     Chặng 4: Practice (hoặc Show and Tell)
+   Mỗi Unit có 5 chặng:
+     Khởi động (hát): mở ngay khi sang Unit mới, không bắt buộc
+     Bài 1 · Từ vựng: mở ngay khi sang Unit mới
+     Bài 2 · Từ vựng → Bài 3 · Truyện → Bài 4 · Thực hành: mở lần lượt
    Một mục tính là "xong" khi bé chơi hết ít nhất 1 trò trong mục đó
    (trò gửi điểm về LC.score); bài hát khởi động cần ít nhất 1 sao.
-   Xong Chặng 4 của Unit trước thì mở Chặng 1 của Unit sau.
+   Xong Bài 4 của Unit trước thì mở Unit sau.
 
    Giáo viên xem thử, mở hết: thêm ?giaovien=1 vào địa chỉ (tắt: ?giaovien=0). */
 (function () {
@@ -21,8 +20,10 @@
   // ▲
 
   var FOLDER = { "warm-up": "warm-up", "vocab-1": "vocab-bai-1", "vocab-2": "vocab-bai-2", "story": "story", "practice": "practice", "sat": "show-and-tell" };
+  /* n = số bài (0 = Khởi động). Chặng optional không chặn chặng sau. */
   var STAGES = [
-    { n: 1, need: ["warm-up", "vocab-1"], all: true },
+    { n: 0, need: ["warm-up"], optional: true },
+    { n: 1, need: ["vocab-1"] },
     { n: 2, need: ["vocab-2"] },
     { n: 3, need: ["story"] },
     { n: 4, need: ["practice", "sat"], all: false }
@@ -71,17 +72,21 @@
       for (var s = 0; s < STAGES.length; s++) {
         var st = STAGES[s];
         var done = st.all !== false ? st.need.every(function (k) { return items[k]; }) : st.need.some(function (k) { return items[k]; });
-        stages.push({ n: st.n, open: open, done: done });
-        if (!free) open = open && done;
+        stages.push({ n: st.n, open: open, done: done, optional: !!st.optional });
+        if (!free && !st.optional) open = open && done;
       }
-      var udone = stages[3].done && stages[3].open;
+      var last = stages[stages.length - 1], udone = last.done && last.open;
       units.push({ n: u, free: u <= OPEN_UPTO, open: stages[0].open, done: udone, stages: stages, items: items });
       if (u > OPEN_UPTO) {
-        if (!cur) for (var j = 0; j < 4; j++) if (stages[j].open && !stages[j].done) { cur = { u: u, s: j + 1 }; break; }
+        /* chặng đang học: Khởi động chỉ là chặng đang học khi bé chưa làm Bài 1 */
+        if (!cur) for (var j = 0; j < stages.length; j++) {
+          if (stages[j].optional && stages[1].done) continue;
+          if (stages[j].open && !stages[j].done) { cur = { u: u, s: j }; break; }
+        }
         prevDone = udone;
       }
     }
-    if (!cur) cur = { u: LAST, s: 4, all: true };
+    if (!cur) cur = { u: LAST, s: STAGES.length - 1, all: true };
     return { units: units, cur: cur, teacher: T, openUpto: OPEN_UPTO, last: LAST };
   }
 
@@ -120,8 +125,7 @@
       document.querySelectorAll("a.go[data-key]").forEach(function (a) {
         var st = U.stages[stageOf(a.dataset.key)];
         a.classList.toggle("lc-lock", !st.open);
-        a.dataset.lcMsg = st.open ? "" : "Con học xong Chặng " + st.n + " trước nhé! 🔒";
-        if (st.n > 1 && !st.open) a.dataset.lcMsg = "Con học xong Chặng " + (st.n - 1) + " trước nhé! 🔒";
+        a.dataset.lcMsg = st.open ? "" : "Con học xong Bài " + (st.n - 1) + " trước nhé! 🔒";
       });
     }
     document.addEventListener("click", function (e) {

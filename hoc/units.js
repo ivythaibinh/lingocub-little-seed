@@ -16,15 +16,21 @@ window.LC_UNITS = [
       "k": "warm-up",
       "label": "Hát khởi động",
       "url": "../unit-1/warm-up/"
-     },
+     }
+    ],
+    "lines": [
+     "Hello · Good-bye (6 bài hát Anh – Trung)"
+    ]
+   },
+   {
+    "items": [
      {
       "k": "vocab-1",
-      "label": "Từ vựng · Bài 1",
+      "label": "Học từ vựng",
       "url": "../unit-1/vocab-bai-1/"
      }
     ],
     "lines": [
-     "Hello · Good-bye (6 bài hát Anh – Trung)",
      "Chào thầy cô & bạn bè"
     ]
    },
@@ -32,7 +38,7 @@ window.LC_UNITS = [
     "items": [
      {
       "k": "vocab-2",
-      "label": "Từ vựng · Bài 2",
+      "label": "Học từ vựng",
       "url": "../unit-1/vocab-bai-2/"
      }
     ],
@@ -83,15 +89,21 @@ window.LC_UNITS = [
       "k": "warm-up",
       "label": "Hát khởi động",
       "url": "../unit-2/warm-up/"
-     },
+     }
+    ],
+    "lines": [
+     "What's Your Name? · My Name Is Minwoo · How Old Are You?"
+    ]
+   },
+   {
+    "items": [
      {
       "k": "vocab-1",
-      "label": "Từ vựng · Bài 1",
+      "label": "Học từ vựng",
       "url": "../unit-2/vocab-bai-1/"
      }
     ],
     "lines": [
-     "What's Your Name? · My Name Is Minwoo · How Old Are You?",
      "Hỏi tên"
     ]
    },
@@ -99,7 +111,7 @@ window.LC_UNITS = [
     "items": [
      {
       "k": "vocab-2",
-      "label": "Từ vựng · Bài 2",
+      "label": "Học từ vựng",
       "url": "../unit-2/vocab-bai-2/"
      }
     ],
@@ -151,15 +163,21 @@ window.LC_UNITS = [
       "k": "warm-up",
       "label": "Hát khởi động",
       "url": "../unit-3/warm-up/"
-     },
+     }
+    ],
+    "lines": [
+     "The Finger Family · She's My Mother"
+    ]
+   },
+   {
+    "items": [
      {
       "k": "vocab-1",
-      "label": "Từ vựng · Bài 1",
+      "label": "Học từ vựng",
       "url": "../unit-3/vocab-bai-1/"
      }
     ],
     "lines": [
-     "The Finger Family · She's My Mother",
      "Bố mẹ, ông bà"
     ]
    },
@@ -167,7 +185,7 @@ window.LC_UNITS = [
     "items": [
      {
       "k": "vocab-2",
-      "label": "Từ vựng · Bài 2",
+      "label": "Học từ vựng",
       "url": "../unit-3/vocab-bai-2/"
      }
     ],
@@ -224,15 +242,21 @@ window.LC_UNITS = [
       "k": "warm-up",
       "label": "Hát khởi động",
       "url": "../unit-4/warm-up/"
-     },
+     }
+    ],
+    "lines": [
+     "Head and Shoulders"
+    ]
+   },
+   {
+    "items": [
      {
       "k": "vocab-1",
-      "label": "Từ vựng · Bài 1",
+      "label": "Học từ vựng",
       "url": "../unit-4/vocab-bai-1/"
      }
     ],
     "lines": [
-     "Head and Shoulders",
      "Tay, chân, đầu, to, nhỏ"
     ]
    },
@@ -240,7 +264,7 @@ window.LC_UNITS = [
     "items": [
      {
       "k": "vocab-2",
-      "label": "Từ vựng · Bài 2",
+      "label": "Học từ vựng",
       "url": "../unit-4/vocab-bai-2/"
      }
     ],
@@ -297,15 +321,21 @@ window.LC_UNITS = [
       "k": "warm-up",
       "label": "Hát khởi động",
       "url": "../unit-5/warm-up/"
-     },
+     }
+    ],
+    "lines": [
+     "If You're Happy · They Are Angry"
+    ]
+   },
+   {
+    "items": [
      {
       "k": "vocab-1",
-      "label": "Từ vựng · Bài 1",
+      "label": "Học từ vựng",
       "url": "../unit-5/vocab-bai-1/"
      }
     ],
     "lines": [
-     "If You're Happy · They Are Angry",
      "Vui, buồn, giận, buồn ngủ"
     ]
    },
@@ -313,7 +343,7 @@ window.LC_UNITS = [
     "items": [
      {
       "k": "vocab-2",
-      "label": "Từ vựng · Bài 2",
+      "label": "Học từ vựng",
       "url": "../unit-5/vocab-bai-2/"
      }
     ],
@@ -364,15 +394,21 @@ window.LC_UNITS = [
       "k": "warm-up",
       "label": "Hát khởi động",
       "url": "../unit-6/warm-up/"
-     },
+     }
+    ],
+    "lines": [
+     "What's This? · Teacher Happy Birthday"
+    ]
+   },
+   {
+    "items": [
      {
       "k": "vocab-1",
-      "label": "Từ vựng · Bài 1",
+      "label": "Học từ vựng",
       "url": "../unit-6/vocab-bai-1/"
      }
     ],
     "lines": [
-     "What's This? · Teacher Happy Birthday",
      "Sách, cặp, this / that / these / those"
     ]
    },
@@ -380,7 +416,7 @@ window.LC_UNITS = [
     "items": [
      {
       "k": "vocab-2",
-      "label": "Từ vựng · Bài 2",
+      "label": "Học từ vựng",
       "url": "../unit-6/vocab-bai-2/"
      }
     ],
@@ -437,15 +473,21 @@ window.LC_UNITS = [
       "k": "warm-up",
       "label": "Hát khởi động",
       "url": "../unit-7/warm-up/"
-     },
+     }
+    ],
+    "lines": [
+     "What Is This? · Where Is the Kitty? · Where Are the Books?"
+    ]
+   },
+   {
+    "items": [
      {
       "k": "vocab-1",
-      "label": "Từ vựng · Bài 1",
+      "label": "Học từ vựng",
       "url": "../unit-7/vocab-bai-1/"
      }
     ],
     "lines": [
-     "What Is This? · Where Is the Kitty? · Where Are the Books?",
      "Bàn, ghế, trên, dưới"
     ]
    },
@@ -453,7 +495,7 @@ window.LC_UNITS = [
     "items": [
      {
       "k": "vocab-2",
-      "label": "Từ vựng · Bài 2",
+      "label": "Học từ vựng",
       "url": "../unit-7/vocab-bai-2/"
      }
     ],
@@ -510,15 +552,21 @@ window.LC_UNITS = [
       "k": "warm-up",
       "label": "Hát khởi động",
       "url": "../unit-8/warm-up/"
-     },
+     }
+    ],
+    "lines": [
+     "Can You Swim? · I Can Walk"
+    ]
+   },
+   {
+    "items": [
      {
       "k": "vocab-1",
-      "label": "Từ vựng · Bài 1",
+      "label": "Học từ vựng",
       "url": "../unit-8/vocab-bai-1/"
      }
     ],
     "lines": [
-     "Can You Swim? · I Can Walk",
      "Chó, mèo, cá, chim, thỏ, chuột"
     ]
    },
@@ -526,7 +574,7 @@ window.LC_UNITS = [
     "items": [
      {
       "k": "vocab-2",
-      "label": "Từ vựng · Bài 2",
+      "label": "Học từ vựng",
       "url": "../unit-8/vocab-bai-2/"
      }
     ],
@@ -583,15 +631,21 @@ window.LC_UNITS = [
       "k": "warm-up",
       "label": "Hát khởi động",
       "url": "../unit-9/warm-up/"
-     },
+     }
+    ],
+    "lines": [
+     "Do You Like Pizza? · I Like Ice Cream"
+    ]
+   },
+   {
+    "items": [
      {
       "k": "vocab-1",
-      "label": "Từ vựng · Bài 1",
+      "label": "Học từ vựng",
       "url": "../unit-9/vocab-bai-1/"
      }
     ],
     "lines": [
-     "Do You Like Pizza? · I Like Ice Cream",
      "Pizza, cơm, táo, chuối"
     ]
    },
@@ -599,7 +653,7 @@ window.LC_UNITS = [
     "items": [
      {
       "k": "vocab-2",
-      "label": "Từ vựng · Bài 2",
+      "label": "Học từ vựng",
       "url": "../unit-9/vocab-bai-2/"
      }
     ],
@@ -651,15 +705,21 @@ window.LC_UNITS = [
       "k": "warm-up",
       "label": "Hát khởi động",
       "url": "../unit-10/warm-up/"
-     },
+     }
+    ],
+    "lines": [
+     "How's the Weather?"
+    ]
+   },
+   {
+    "items": [
      {
       "k": "vocab-1",
-      "label": "Từ vựng · Bài 1",
+      "label": "Học từ vựng",
       "url": "../unit-10/vocab-bai-1/"
      }
     ],
     "lines": [
-     "How's the Weather?",
      "Nắng, mưa, gió, âm u, tuyết"
     ]
    },
@@ -667,7 +727,7 @@ window.LC_UNITS = [
     "items": [
      {
       "k": "vocab-2",
-      "label": "Từ vựng · Bài 2",
+      "label": "Học từ vựng",
       "url": "../unit-10/vocab-bai-2/"
      }
     ],
@@ -719,15 +779,21 @@ window.LC_UNITS = [
       "k": "warm-up",
       "label": "Hát khởi động",
       "url": "../unit-11/warm-up/"
-     },
+     }
+    ],
+    "lines": [
+     "Colors Song · What Color Is This? · My Favorite Color Is Blue"
+    ]
+   },
+   {
+    "items": [
      {
       "k": "vocab-1",
-      "label": "Từ vựng · Bài 1",
+      "label": "Học từ vựng",
       "url": "../unit-11/vocab-bai-1/"
      }
     ],
     "lines": [
-     "Colors Song · What Color Is This? · My Favorite Color Is Blue",
      "Đỏ, xanh dương, vàng, xanh lá"
     ]
    },
@@ -735,7 +801,7 @@ window.LC_UNITS = [
     "items": [
      {
       "k": "vocab-2",
-      "label": "Từ vựng · Bài 2",
+      "label": "Học từ vựng",
       "url": "../unit-11/vocab-bai-2/"
      }
     ],
@@ -787,15 +853,21 @@ window.LC_UNITS = [
       "k": "warm-up",
       "label": "Hát khởi động",
       "url": "../unit-12/warm-up/"
-     },
+     }
+    ],
+    "lines": [
+     "Five Little Monkeys"
+    ]
+   },
+   {
+    "items": [
      {
       "k": "vocab-1",
-      "label": "Từ vựng · Bài 1",
+      "label": "Học từ vựng",
       "url": "../unit-12/vocab-bai-1/"
      }
     ],
     "lines": [
-     "Five Little Monkeys",
      "Đếm người và con vật: 个, 只, 两"
     ]
    },
@@ -803,7 +875,7 @@ window.LC_UNITS = [
     "items": [
      {
       "k": "vocab-2",
-      "label": "Từ vựng · Bài 2",
+      "label": "Học từ vựng",
       "url": "../unit-12/vocab-bai-2/"
      }
     ],
