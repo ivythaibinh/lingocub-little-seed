@@ -32,7 +32,9 @@ Trang chủ có 2 nút: **Vào học** (trang chọn Unit, ở `hoc/`) và **Nô
 
 ```
 index.html              ← trang chủ: logo, Little Seed, nút "Vào học" và "Nông trại của bé"
-hoc/index.html          ← trang chọn 12 Unit (nút "Vào học")
+hoc/index.html          ← bản đồ hành trình (nút "Vào học"): Unit 12 → 1, mở khóa theo chặng
+hoc/units.js            ← dữ liệu bản đồ, tạo bằng tools/build-hoc.py
+assets/lc-path.js       ← luật mở khóa (OPEN_UPTO = Unit lớp đã học xong; ?giaovien=1 mở hết)
 nong-trai/              ← Nông trại của bé (xem mục "Nông trại" bên dưới)
 assets/                 ← hình Leo, Bunny, Buffy, Xiaobao, lc-track.js
 assets/pixel/           ← font pixel, logo, hình trâu, sư tử MC, kiểu pixel dùng chung
@@ -91,3 +93,12 @@ Bé học để kiếm sao, rồi đổi sao lấy hạt giống, con vật, câ
 - **Điện thoại:** màn hình hẹp (dưới 600px) dùng bố cục nông trại dọc, vừa khít bề ngang, không phải trượt sang; trang xếp lại: thời tiết → nông trại → khu đổi sao → lịch tuần → cây lớp.
 
 **Sau khi cập nhật bản này:** mở Apps Script, thay toàn bộ mã bằng `apps-script/Code.gs` mới → Lưu → Triển khai → Quản lý các bản triển khai → bút chì → Phiên bản mới → Triển khai (link /exec giữ nguyên). Không cần chạy lại `caiDat` (chạy lại cũng được: hàm sẽ thêm ô B4 và trang "Nông trại").
+
+## Bản đồ hành trình (`hoc/`)
+
+- Mỗi Unit có 4 chặng mở lần lượt: (1) Warm-up + Vocabulary Bài 1 → (2) Vocabulary Bài 2 → (3) Story → (4) Practice. Xong Chặng 4 thì mở Unit sau.
+- Một mục tính là xong khi bé chơi hết ít nhất 1 trò trong mục đó (bài hát cần ít nhất 1 sao).
+- Unit 1 đến `OPEN_UPTO` (trong `assets/lc-path.js`, đang là 8) mở sẵn để ôn tập; nút **Ôn tập** cuộn xuống các Unit này.
+- Giáo viên xem thử, mở hết mọi chặng: thêm `?giaovien=1` vào địa chỉ (tắt: `?giaovien=0`).
+- Trang Unit cũng khóa mục chưa mở; Unit chưa mở thì tự quay về bản đồ.
+- Thêm Unit hoặc sửa mô tả trong trang Unit: chạy `python3 tools/build-hoc.py`.
