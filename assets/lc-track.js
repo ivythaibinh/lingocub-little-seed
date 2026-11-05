@@ -111,6 +111,64 @@
     var L = ledger(); if (!L.sat[UNIT]) { L.sat[UNIT] = day(); set(starKey(u), L); }
   }
 
+
+  /* ---------- vỗ tay + pháo hoa 2 giây khi bé chơi xong một trò ---------- */
+  var cheering = false, actx = null;
+  function applause(ms) {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      actx = actx || new AC(); if (actx.state === "suspended") actx.resume();
+      var sr = actx.sampleRate, len = Math.floor(sr * 0.09), buf = actx.createBuffer(1, len, sr), d = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+      var t0 = actx.currentTime + 0.02, n = Math.floor(ms / 1000 * 38);
+      for (var c = 0; c < n; c++) {
+        var at = t0 + Math.random() * (ms / 1000 - 0.15), src = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
+        src.buffer = buf; src.playbackRate.value = 0.8 + Math.random() * 0.7;
+        f.type = "bandpass"; f.frequency.value = 1200 + Math.random() * 2400; f.Q.value = 0.7;
+        var fade = Math.min(1, Math.min(at - t0 + 0.25, t0 + ms / 1000 - at) / 0.4);
+        g.gain.value = (0.35 + Math.random() * 0.5) * Math.max(0.15, fade);
+        src.connect(f); f.connect(g); g.connect(actx.destination); src.start(at);
+      }
+    } catch (e) {}
+  }
+  function fireworks(ms) {
+    var cv = document.createElement("canvas");
+    cv.setAttribute("aria-hidden", "true");
+    cv.style.cssText = "position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2147483000";
+    var dpr = Math.min(window.devicePixelRatio || 1, 2), W = window.innerWidth, H = window.innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr; document.body.appendChild(cv);
+    var x = cv.getContext("2d"); x.scale(dpr, dpr);
+    var COL = ["#FFD84D", "#FF6B6B", "#4DD6A5", "#5AB8FF", "#FF9F43", "#C58BFF", "#FFFFFF"], parts = [], bursts = 0, start = performance.now();
+    function burst() {
+      var cx = W * (0.15 + Math.random() * 0.7), cy = H * (0.15 + Math.random() * 0.4), col = COL[Math.floor(Math.random() * COL.length)], n = 44;
+      for (var i = 0; i < n; i++) {
+        var a = Math.PI * 2 * i / n + Math.random() * 0.2, v = 90 + Math.random() * 150;
+        parts.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v, c: Math.random() < 0.25 ? "#fff" : col, life: 0.9 + Math.random() * 0.4, age: 0 });
+      }
+    }
+    var times = [0, 250, 550, 850, 1150], prev = start;
+    (function frame(now) {
+      var dt = Math.min(0.05, (now - prev) / 1000); prev = now;
+      var el = now - start;
+      while (bursts < times.length && el >= times[bursts]) { burst(); bursts++; }
+      x.clearRect(0, 0, W, H);
+      for (var i = parts.length - 1; i >= 0; i--) {
+        var p = parts[i]; p.age += dt;
+        if (p.age >= p.life) { parts.splice(i, 1); continue; }
+        p.vy += 160 * dt; p.vx *= 0.985; p.x += p.vx * dt; p.y += p.vy * dt;
+        x.globalAlpha = Math.max(0, 1 - p.age / p.life); x.fillStyle = p.c;
+        x.fillRect(Math.round(p.x) - 3, Math.round(p.y) - 3, 6, 6);
+      }
+      x.globalAlpha = 1;
+      if (el < ms) requestAnimationFrame(frame); else cv.remove();
+    })(start);
+  }
+  function cheer() {
+    if (cheering || !document.body) return;
+    cheering = true; setTimeout(function () { cheering = false; }, 2100);
+    applause(2000); fireworks(2000);
+  }
+
   var last = {};
   var LC = window.LC = {
     api: API, root: ROOT, unit: UNIT, section: SEC, page: PAGE,
@@ -123,9 +181,10 @@
       last[k] = now;
       ev("score", { game: game, score: Number(score) || 0, total: Number(total) || 0, note: note || undefined });
       addScore(game, Number(score) || 0);
+      cheer();
     },
     record: function (kind, secs, game) { ev(kind === "audio" ? "audio" : "video", { secs: secs, game: game }); if (kind !== "audio") addSat(); },
-    log: ev, flush: flush, day: day, ledger: ledger, starKey: starKey, get: get, set: set,
+    cheer: cheer, log: ev, flush: flush, day: day, ledger: ledger, starKey: starKey, get: get, set: set,
     login: function () { showLogin(true); }
   };
   if (MODE !== "kid") return;
