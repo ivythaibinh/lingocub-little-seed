@@ -329,7 +329,7 @@
       (kids.length ? '<span class="lc-sep">Bé nào đang học?</span><div class="lc-kids">' +
         kids.map(function (k, i) { return '<button type="button" class="lc-kid' + (prev && prev.id === k.id ? " on" : "") + '" data-i="' + i + '">' + esc(k.name) + "</button>"; }).join("") +
         '</div><span class="lc-sep">Hoặc đăng nhập bé khác</span>' : "<p>Bố mẹ đăng nhập giúp con nhé. Máy sẽ nhớ cho lần sau.</p>") +
-      '<label>Tên đăng nhập<input name="n" autocomplete="username" autocapitalize="words" maxlength="40" placeholder="Tên của bé, ví dụ: Minh An"></label>' +
+      '<label>Tên đăng nhập của bé<input name="n" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="40" placeholder="phamminhan2019"><span class="lc-hint" style="display:block;font-weight:700;font-size:13px;line-height:1.4;color:#7a6652;margin-top:4px">Bố mẹ điền họ tên của bé viết liền, không dấu, thêm năm sinh.<br>Ví dụ: Phạm Minh An, sinh năm 2019 ➜ <b style="color:#3D2F24">phamminhan2019</b></span></label>' +
       '<label>Mật khẩu (số điện thoại bố hoặc mẹ)<span class="lc-pw"><input name="p" type="password" inputmode="numeric" autocomplete="current-password" maxlength="15" placeholder="09xx xxx xxx"><button type="button" class="lc-eye" data-eye>Hiện</button></span></label>' +
       '<div class="lc-err" aria-live="polite"></div>' +
       '<button class="lc-go" type="submit">Vào học ▶</button>' +
