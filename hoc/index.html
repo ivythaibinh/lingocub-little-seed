@@ -409,7 +409,7 @@ function tap(n, s){
   if(!st.open){
     el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake");
     const prev = s > 1 ? "Bài " + (s - 1) + " của Unit " + n : "Unit " + (n - 1);
-    toast("🔒 Con học xong " + prev + " trước nhé!");
+    toast("🔒 Con làm hết các trò ở " + prev + " trước nhé!");
     return;
   }
   openSheet(n, s);

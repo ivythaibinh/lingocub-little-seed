@@ -61,4 +61,17 @@ for n in sorted(TITLES):
 out = "/* Tạo tự động bằng tools/build-hoc.py — đừng sửa tay. */\nwindow.LC_UNITS = " + \
       json.dumps(units, ensure_ascii=False, indent=1) + ";\n"
 open(os.path.join(ROOT, "hoc", "units.js"), "w", encoding="utf-8").write(out)
+
+# Số trò (không tính flashcard) của từng bài từ vựng -> assets/lc-path.js (đoạn /*REQ*/ ... /*END*/)
+req = {}
+for n in sorted(TITLES):
+    for folder in ("vocab-bai-1", "vocab-bai-2"):
+        pg = open(os.path.join(ROOT, f"unit-{n}", folder, "index.html"), encoding="utf-8").read()
+        tabs = re.findall(r'<button class="tab" role="tab" id="t-([a-z0-9-]+)"', pg)
+        req[f"{n}|{folder}"] = len([t for t in tabs if t != "flashcards"])
+pp = os.path.join(ROOT, "assets", "lc-path.js")
+src = open(pp, encoding="utf-8").read()
+src = re.sub(r"/\*REQ\*/.*?/\*END\*/", lambda m: "/*REQ*/" + json.dumps(req, ensure_ascii=False) + "/*END*/", src, flags=re.S)
+open(pp, "w", encoding="utf-8").write(src)
+print("REQ:", req)
 print("hoc/units.js:", len(units), "unit")

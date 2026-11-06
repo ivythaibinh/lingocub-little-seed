@@ -193,7 +193,12 @@
       addScore(game, Number(score) || 0);
       cheer();
     },
-    record: function (kind, secs, game) { ev(kind === "audio" ? "audio" : "video", { secs: secs, game: game }); if (kind !== "audio") addSat(); },
+    record: function (kind, secs, game) {
+      ev(kind === "audio" ? "audio" : "video", { secs: secs, game: game });
+      if (kind !== "audio") addSat();
+      /* Lồng tiếng (truyện): quay xong từ 5 giây trở lên thì tính là xong trò, gửi như điểm 0 sao để máy chủ cũng nhớ */
+      if (kind !== "audio" && SEC === "story" && secs >= 5) LC.score("Lồng tiếng", 0, 0, "Quay " + secs + " giây");
+    },
     cheer: cheer, log: ev, flush: flush, day: day, ledger: ledger, starKey: starKey, get: get, set: set,
     login: function () { showLogin(true); }
   };

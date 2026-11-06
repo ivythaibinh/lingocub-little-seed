@@ -5,8 +5,11 @@
      Khởi động (hát): mở ngay khi sang Unit mới, không bắt buộc
      Bài 1 · Từ vựng: mở ngay khi sang Unit mới
      Bài 2 · Từ vựng → Bài 3 · Truyện → Bài 4 · Thực hành: mở lần lượt
-   Một mục tính là "xong" khi bé chơi hết ít nhất 1 trò trong mục đó
-   (trò gửi điểm về LC.score); bài hát khởi động cần ít nhất 1 sao.
+   Một mục tính là "xong" khi:
+     - Bài 1, Bài 2 (Từ vựng): bé chơi hết các trò (trừ flashcard), số trò đếm trong REQ bên dưới
+     - Bài 3 (Truyện): làm xong Quiz và Lồng tiếng
+     - Bài 4 (Thực hành): chơi Practice hoặc quay Show and Tell
+     - Khởi động: ít nhất 1 sao
    Xong Bài 4 của Unit trước thì mở Unit sau.
 
    Giáo viên xem thử, mở hết: thêm ?giaovien=1 vào địa chỉ (tắt: ?giaovien=0). */
@@ -18,6 +21,9 @@
   var OPEN_UPTO = 8;
   var LAST = 12;
   // ▲
+
+  /* Số trò phải chơi (không tính flashcard) ở mỗi bài từ vựng — do tools/build-hoc.py ghi tự động */
+  var REQ = /*REQ*/{"1|vocab-bai-1": 3, "1|vocab-bai-2": 3, "2|vocab-bai-1": 1, "2|vocab-bai-2": 3, "3|vocab-bai-1": 3, "3|vocab-bai-2": 3, "4|vocab-bai-1": 3, "4|vocab-bai-2": 3, "5|vocab-bai-1": 3, "5|vocab-bai-2": 3, "6|vocab-bai-1": 3, "6|vocab-bai-2": 3, "7|vocab-bai-1": 3, "7|vocab-bai-2": 3, "8|vocab-bai-1": 3, "8|vocab-bai-2": 3, "9|vocab-bai-1": 3, "9|vocab-bai-2": 3, "10|vocab-bai-1": 3, "10|vocab-bai-2": 3, "11|vocab-bai-1": 3, "11|vocab-bai-2": 3, "12|vocab-bai-1": 2, "12|vocab-bai-2": 3}/*END*/;
 
   var FOLDER = { "warm-up": "warm-up", "vocab-1": "vocab-bai-1", "vocab-2": "vocab-bai-2", "story": "story", "practice": "practice", "sat": "show-and-tell" };
   /* n = số bài (0 = Khởi động). Chặng optional không chặn chặng sau. */
@@ -51,15 +57,24 @@
     return [a, get(srvKey(), null) || { d: {}, sat: {} }];
   }
   function finished(Ls, unit, key) {
-    var pre = unit + "|" + FOLDER[key] + "|";
+    var pre = unit + "|" + FOLDER[key] + "|", names = {}, nQuiz = false, nDub = false;
     for (var i = 0; i < Ls.length; i++) {
       var L = Ls[i] || {}, d = L.d || {};
       if ((key === "practice" || key === "sat") && L.sat && L.sat[unit]) return true;
       for (var day in d) {
         var t = d[day];
-        for (var k in t) if (k.indexOf(pre) === 0 && (key !== "warm-up" || Number(t[k]) >= 1)) return true;
+        for (var k in t) {
+          if (k.indexOf(pre) !== 0) continue;
+          var g = k.slice(pre.length);
+          if (key === "warm-up") { if (Number(t[k]) >= 1) return true; continue; }
+          if (key === "practice" || key === "sat") return true;
+          if (key === "story") { if (g.indexOf("Quiz") === 0) nQuiz = true; else if (g === "Lồng tiếng") nDub = true; continue; }
+          names[g] = 1;
+        }
       }
     }
+    if (key === "story") return nQuiz && nDub;
+    if (key === "vocab-1" || key === "vocab-2") return Object.keys(names).length >= (REQ[unit + "|" + FOLDER[key]] || 1);
     return false;
   }
 
@@ -125,7 +140,7 @@
       document.querySelectorAll("a.go[data-key]").forEach(function (a) {
         var st = U.stages[stageOf(a.dataset.key)];
         a.classList.toggle("lc-lock", !st.open);
-        a.dataset.lcMsg = st.open ? "" : "Con học xong Bài " + (st.n - 1) + " trước nhé! 🔒";
+        a.dataset.lcMsg = st.open ? "" : "Con làm hết các trò ở Bài " + (st.n - 1) + " trước nhé! 🔒";
       });
     }
     document.addEventListener("click", function (e) {
