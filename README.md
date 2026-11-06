@@ -54,7 +54,7 @@ unit-N/
 
 ## Đăng nhập và theo dõi tiến độ (Google Sheet)
 
-- Lần đầu vào web, bố mẹ nhập **tên bé + số điện thoại bố/mẹ**. Máy nhớ các bé đã đăng nhập; nút **Đổi bé** ở trang chủ và trang Unit để đổi bé trên máy dùng chung.
+- **Tài khoản đăng ký qua Google Form:** tên đăng nhập (tên của bé) + số điện thoại bố/mẹ làm mật khẩu. Web chỉ cho vào khi tài khoản đã đăng ký. Máy nhớ các bé đã đăng nhập; nút **Đổi bé** ở trang chủ để đổi bé.
 - Mỗi khi bé mở một mục, chơi xong một trò (điểm, ví dụ Duck Race 5/6), quay video Show and Tell / lồng tiếng, web gửi một dòng về Google Sheet. Mất mạng thì dữ liệu được giữ trên máy và gửi lại sau.
 - Dấu "đã học" trên trang chủ và trang Unit theo từng bé, và tự đồng bộ từ Google Sheet (bé học trên máy khác vẫn có dấu).
 - **Trang giáo viên:** `giao-vien/` (link nhỏ "Trang giáo viên" ở cuối trang chủ). Cần mật khẩu ở ô B1 trang "Cài đặt" của Google Sheet. Có lọc theo lớp, bé, Unit, thời gian; 5 thẻ: Tổng quan lớp, Chi tiết từng bé, Điểm theo trò, Nhật ký, Học sinh & lớp (xếp lớp cho bé). Chưa nối Sheet thì bấm "Xem dữ liệu mẫu".
@@ -102,3 +102,12 @@ Bé học để kiếm sao, rồi đổi sao lấy hạt giống, con vật, câ
 - Giáo viên xem thử, mở hết mọi chặng: thêm `?giaovien=1` vào địa chỉ (tắt: `?giaovien=0`).
 - Trang Unit cũng khóa mục chưa mở; Unit chưa mở thì tự quay về bản đồ.
 - Thêm Unit hoặc sửa mô tả trong trang Unit: chạy `python3 tools/build-hoc.py`.
+
+### Đăng ký tài khoản bằng Google Form (làm một lần)
+
+1. Dán `apps-script/Code.gs` mới vào Apps Script, bấm Lưu.
+2. Chạy hàm **taoForm** (cho phép quyền). Hàm tạo Form, nối câu trả lời vào Sheet, cài trình tự động thêm mỗi lượt đăng ký vào trang "Học sinh", và ghi link Form vào ô B5 trang "Cài đặt". Link Form cũng hiện ở màn đăng nhập của web.
+3. Triển khai → Quản lý các bản triển khai → bút chì → Phiên bản mới → Triển khai.
+4. Gửi link Form cho phụ huynh. Nếu nghi có lượt đăng ký bị sót, chạy hàm **dongBoDangKy**.
+
+Xóa dữ liệu cũ: chạy **xoaTaiKhoanCu** (chỉ xóa tài khoản) hoặc **xoaToanBoDuLieuThu** (xóa cả nhật ký điểm và nông trại thử). Lỡ tay thì Tệp → Lịch sử phiên bản của Google Sheet khôi phục được. Đăng nhập cũ còn lưu trên điện thoại/máy tính của bé được web tự xóa ở lần mở tiếp theo.

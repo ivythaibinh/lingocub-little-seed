@@ -50,6 +50,7 @@ function caiDat() {
     cd.getRange('A4:B4').setValues([['Sao mục tiêu mỗi bé / tuần (Cây Đại Thụ của lớp)', 40]]);
     cd.getRange('A4').setFontWeight('bold');
   }
+  if (!cd.getRange('A5').getValue()) cd.getRange('A5').setValue('Link form đăng ký (bố mẹ) — hàm taoForm tự điền').setFontWeight('bold');
   sheet_(SH_NT, NT_HEAD).getRange('C:C').setNumberFormat('dd/MM/yyyy HH:mm');
   var bd = ss.getSheetByName(SH_BD);
   if (!bd) {
@@ -92,6 +93,7 @@ function slug_(s) {
 function phone_(p) {
   var d = String(p || '').replace(/\D/g, '');
   if (d.indexOf('84') === 0 && d.length === 11) d = '0' + d.slice(2);
+  if (d.length === 9 && d.charAt(0) !== '0') d = '0' + d;
   return d;
 }
 function cleanName_(n) { return String(n || '').replace(/\s+/g, ' ').trim().slice(0, 60); }
@@ -102,9 +104,10 @@ function sameKid_(a, b) {
 }
 function settings_() {
   var cd = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SH_CD);
-  if (!cd) return { pass: '', classes: [], goal: 40 };
-  var v = cd.getRange('B1:B4').getDisplayValues();
+  if (!cd) return { pass: '', classes: [], goal: 40, form: '' };
+  var v = cd.getRange('B1:B5').getDisplayValues();
   return {
+    form: String(v[4][0]).trim(),
     pass: String(v[0][0]).trim(),
     classes: String(v[1][0]).split(',').map(function (x) { return x.trim(); }).filter(String),
     goal: Number(v[3][0]) > 0 ? Number(v[3][0]) : 40
@@ -135,6 +138,7 @@ function students_() {
 function doGet(e) {
   var p = (e && e.parameter) || {};
   try {
+    if (p.action === 'config') return json_({ ok: true, form: settings_().form });
     if (p.action === 'progress') return json_({ ok: true, progress: progress_(p.id) });
     if (p.action === 'kid') return json_(kid_(p.id));
     if (p.action === 'farm') return json_(farm_(p.id));
@@ -151,7 +155,10 @@ function doPost(e) {
   var lock = LockService.getScriptLock();
   try {
     lock.waitLock(25000);
-    if (b.action === 'login') return json_({ ok: true, student: login_(b.name, b.phone) });
+    if (b.action === 'login') {
+      try { return json_({ ok: true, student: login_(b.name, b.phone) }); }
+      catch (le) { return json_({ ok: false, error: String(le.message || le), form: settings_().form }); }
+    }
     if (b.action === 'log') return json_({ ok: true, n: log_(b.events || []) });
     if (b.action === 'setClass') { checkKey_(b.key); return json_({ ok: true, student: setClass_(b.id, b.lop) }); }
     if (b.action === 'farmSave') return json_(farmSave_(b.id, b.name, b.state));
@@ -163,22 +170,34 @@ function doPost(e) {
   }
 }
 
-/* ---------- Đăng nhập ---------- */
+/* ---------- Đăng nhập: chỉ vào được khi tài khoản đã đăng ký (Google Form) ---------- */
 function login_(name, phone) {
   name = cleanName_(name); phone = phone_(phone);
-  if (!name) throw new Error('Thiếu tên bé');
-  if (phone.length < 9 || phone.length > 11) throw new Error('Số điện thoại chưa đúng');
-  var s = slug_(name), id = phone + '-' + s, now = new Date();
-  var st = students_();
-  var hit = null;
+  if (!name) throw new Error('Bố mẹ nhập tên đăng nhập của bé nhé.');
+  if (phone.length < 9 || phone.length > 11) throw new Error('Số điện thoại chưa đúng, bố mẹ kiểm tra lại nhé.');
+  var id = phone + '-' + slug_(name), now = new Date();
+  var st = students_(), hit = null;
   st.list.forEach(function (k) { if (!hit && k.id === id) hit = k; });
-  if (!hit) st.list.forEach(function (k) { if (!hit && k.phone === phone && sameKid_(slug_(k.name), s)) hit = k; });
-  if (hit) {
-    st.sh.getRange(hit.row, 6).setValue(now);
-    return { id: hit.id, name: hit.name, phone: phone, lop: hit.lop };
-  }
-  st.sh.appendRow([id, name, "'" + phone, '', now, now, '']);
-  return { id: id, name: name, phone: phone, lop: '' };
+  if (!hit) throw new Error('Tên đăng nhập hoặc số điện thoại chưa đúng, hoặc bé chưa có tài khoản.');
+  st.sh.getRange(hit.row, 6).setValue(now);
+  return { id: hit.id, name: hit.name, phone: phone, lop: hit.lop };
+}
+
+/* Thêm một tài khoản mới (từ Google Form). Trả về 'moi' | 'trung' | 'loi' */
+function themTaiKhoan_(name, phone) {
+  name = cleanName_(name); phone = phone_(phone);
+  if (!name || !slug_(name) || phone.length < 9 || phone.length > 11) return 'loi';
+  var id = phone + '-' + slug_(name), st = students_(), exist = false;
+  st.list.forEach(function (k) { if (k.id === id) exist = true; });
+  if (exist) return 'trung';
+  st.sh.appendRow([id, name, "'" + phone, '', new Date(), '', '']);
+  return 'moi';
+}
+
+function isReg_(id) {
+  var ok = false;
+  students_().list.forEach(function (k) { if (k.id === id) ok = true; });
+  return ok;
 }
 
 function setClass_(id, lop) {
@@ -201,8 +220,10 @@ function log_(events) {
   var now = new Date(), nowMs = now.getTime();
   var base = sh.getLastRow();
   var rows = [], local = {}, bump = [], seen = {};
+  var st = students_(), reg = {};
+  st.list.forEach(function (k) { reg[k.id] = true; });
   events.forEach(function (ev) {
-    if (!ev || !ev.id) return;
+    if (!ev || !ev.id || !reg[ev.id]) return;
     var secs = Math.max(0, Math.min(7200, Math.round(num_(ev.secs) || 0)));
     var sess = str_(ev.session, 40);
     if (ev.type === 'time') {
@@ -230,19 +251,7 @@ function log_(events) {
     var row = sh.getRange(b[0], 11, 1, 3).getValues()[0];
     if (String(row[2]) === b[1]) sh.getRange(b[0], 11).setValue((Number(row[0]) || 0) + b[2]);
   });
-  var ids = Object.keys(seen);
-  if (ids.length) {
-    var st = students_(), known = {};
-    st.list.forEach(function (k) {
-      if (seen[k.id]) { known[k.id] = true; st.sh.getRange(k.row, 6).setValue(now); }
-    });
-    /* bé đăng nhập lúc mất mạng: thêm vào danh sách học sinh */
-    ids.forEach(function (id) {
-      if (known[id]) return;
-      var nm = typeof seen[id] === 'string' ? seen[id] : id;
-      st.sh.appendRow([id, nm, "'" + id.split('-')[0], '', now, now, '']);
-    });
-  }
+  st.list.forEach(function (k) { if (seen[k.id]) st.sh.getRange(k.row, 6).setValue(now); });
   return rows.length + bump.length;
 }
 
@@ -287,6 +296,7 @@ function data_(days) {
 function kid_(id) {
   id = String(id || '');
   if (!id) return { ok: false, error: 'Thiếu mã bé' };
+  if (!isReg_(id)) return { ok: false, error: 'Bé chưa có tài khoản' };
   var ev = events_().filter(function (r) { return String(r[1]) === id && r[0] instanceof Date; })
     .map(function (r) { return [r[0].toISOString()].concat(r.slice(1, 12)); });
   var k = null;
@@ -373,6 +383,7 @@ function farmGet_(id) {
 function farmSave_(id, name, state) {
   id = str_(id, 60);
   if (!id || !state || typeof state !== 'object') return { ok: false, error: 'Thiếu dữ liệu nông trại' };
+  if (!isReg_(id)) return { ok: false, error: 'Bé chưa có tài khoản' };
   var txt = JSON.stringify(state);
   if (txt.length > 45000) return { ok: false, error: 'Dữ liệu nông trại quá lớn' };
   var sh = sheet_(SH_NT, NT_HEAD), n = sh.getLastRow() - 1, row = 0;
@@ -389,4 +400,80 @@ function farmSave_(id, name, state) {
     sh.appendRow([id, cleanName_(name), new Date(), txt]);
   }
   return { ok: true };
+}
+
+/* ================= ĐĂNG KÝ TÀI KHOẢN QUA GOOGLE FORM =================
+   Chạy hàm "taoForm" một lần: tạo Form (tên đăng nhập + số điện thoại bố/mẹ làm mật khẩu),
+   nối câu trả lời vào Sheet này và tự thêm mỗi lượt đăng ký vào trang "Học sinh".
+   Link Form được ghi vào ô B5 trang "Cài đặt" và hiện ở màn đăng nhập của web. */
+function taoForm() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss.getSheetByName(SH_CD)) caiDat();
+  var cd = ss.getSheetByName(SH_CD);
+  var old = String(cd.getRange('B5').getValue() || '').trim();
+  if (old) { Logger.log('Đã có form đăng ký: ' + old + '  (muốn tạo form mới thì xóa ô B5 trang "Cài đặt" rồi chạy lại)'); return old; }
+  var f = FormApp.create('Đăng ký tài khoản · Little Seed');
+  f.setDescription('Bố mẹ đăng ký một lần cho bé. Sau đó bé vào web học, nhập đúng tên đăng nhập và số điện thoại này để vào học.');
+  f.addTextItem().setTitle('Tên đăng nhập của bé')
+    .setHelpText('Ví dụ: Minh An. Bé dùng đúng tên này mỗi lần vào học.').setRequired(true);
+  var ph = f.addTextItem().setTitle('Số điện thoại bố hoặc mẹ (dùng làm mật khẩu)')
+    .setHelpText('Chỉ nhập số, ví dụ 0912345678.').setRequired(true);
+  ph.setValidation(FormApp.createTextValidation().setHelpText('Nhập số điện thoại gồm 9–11 chữ số.')
+    .requireTextMatchesPattern('^[0-9 .+()-]{9,16}$').build());
+  f.setConfirmationMessage('Đã đăng ký xong! Bé quay lại trang web, nhập tên đăng nhập và số điện thoại này để vào học nhé.');
+  f.setCollectEmail(false); f.setLimitOneResponsePerUser(false); f.setAllowResponseEdits(false);
+  f.setDestination(FormApp.DestinationType.SPREADSHEET, ss.getId());
+  ScriptApp.getProjectTriggers().forEach(function (tr) { if (tr.getHandlerFunction() === 'dangKyMoi') ScriptApp.deleteTrigger(tr); });
+  ScriptApp.newTrigger('dangKyMoi').forSpreadsheet(ss).onFormSubmit().create();
+  cd.getRange('B5').setValue(f.getPublishedUrl());
+  Logger.log('LINK FORM ĐĂNG KÝ (gửi cho phụ huynh): ' + f.getPublishedUrl());
+  Logger.log('Link chỉnh sửa form (chỉ chị dùng): ' + f.getEditUrl());
+  return f.getPublishedUrl();
+}
+
+/* Chạy tự động mỗi khi có người gửi form */
+function dangKyMoi(e) {
+  var v = (e && e.values) || [];
+  var lock = LockService.getScriptLock();
+  lock.waitLock(25000);
+  try {
+    var r = themTaiKhoan_(v[1], v[2]);
+    if (r === 'loi') Logger.log('Bỏ qua lượt đăng ký không hợp lệ: ' + JSON.stringify(v));
+  } finally { try { lock.releaseLock(); } catch (x) {} }
+}
+
+/* Dự phòng: thêm vào "Học sinh" mọi lượt đăng ký còn thiếu (chạy tay khi nghi ngờ bị sót) */
+function dongBoDangKy() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet(), moi = 0, trung = 0, loi = 0;
+  var skip = {}; skip[SH_EV] = skip[SH_HS] = skip[SH_CD] = skip[SH_BD] = skip[SH_NT] = true;
+  ss.getSheets().forEach(function (sh) {
+    if (skip[sh.getName()] || sh.getLastRow() < 2 || sh.getLastColumn() < 3) return;
+    var a1 = String(sh.getRange(1, 1).getValue());
+    if (a1 !== 'Dấu thời gian' && a1 !== 'Timestamp') return;
+    sh.getRange(2, 1, sh.getLastRow() - 1, 3).getDisplayValues().forEach(function (r) {
+      var k = themTaiKhoan_(r[1], r[2]);
+      if (k === 'moi') moi++; else if (k === 'trung') trung++; else loi++;
+    });
+  });
+  Logger.log('Thêm mới: ' + moi + ' · đã có: ' + trung + ' · không hợp lệ: ' + loi);
+}
+
+/* ================= XÓA DỮ LIỆU CŨ =================
+   Sau khi xóa, chỉ tài khoản đăng ký mới (qua Form) mới đăng nhập được.
+   Lỡ tay: Tệp → Lịch sử phiên bản của Google Sheet khôi phục lại được. */
+function xoaCot_(name) {
+  var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name);
+  if (!sh || sh.getLastRow() < 2) return 0;
+  var n = sh.getLastRow() - 1;
+  sh.getRange(2, 1, n, Math.max(1, sh.getLastColumn())).clearContent();
+  return n;
+}
+/* (1) Chỉ xóa tài khoản cũ (trang "Học sinh"). Điểm và nông trại cũ vẫn còn nhưng không ai đăng nhập được nữa. */
+function xoaTaiKhoanCu() {
+  Logger.log('Đã xóa ' + xoaCot_(SH_HS) + ' tài khoản cũ. Hãy chạy tiếp hàm dongBoDangKy nếu Form đã có người đăng ký.');
+}
+/* (2) Xóa sạch dữ liệu thử: tài khoản + nhật ký điểm (Sự kiện) + nông trại. */
+function xoaToanBoDuLieuThu() {
+  var a = xoaCot_(SH_HS), b = xoaCot_(SH_EV), c = xoaCot_(SH_NT);
+  Logger.log('Đã xóa: ' + a + ' tài khoản, ' + b + ' dòng nhật ký điểm, ' + c + ' nông trại.');
 }

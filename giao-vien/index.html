@@ -586,7 +586,7 @@ function renderLog() {
 /* Học sinh & lớp */
 function renderStudents() {
   const kids = kidsIn(), cl = classes();
-  let html = head("Học sinh & lớp", "Bé tự có tên ở đây sau lần đăng nhập đầu tiên. Gõ tên lớp rồi bấm ra ngoài để lưu (lưu thẳng vào Google Sheet).", csvBtn("hs"));
+  let html = head("Học sinh & lớp", "Bé có tên ở đây sau khi bố mẹ đăng ký tài khoản qua Google Form. Gõ tên lớp rồi bấm ra ngoài để lưu (lưu thẳng vào Google Sheet).", csvBtn("hs"));
   if (!kids.length) { $("#panel").innerHTML = html + `<div class="empty">Chưa có bé nào.</div>`; return; }
   html += `<datalist id="cls">${cl.map(c => `<option value="${esc(c)}">`).join("")}</datalist><div class="tbl-wrap"><table id="hs"><thead><tr><th>Bé</th><th>Lớp</th><th>SĐT phụ huynh</th><th>Bắt đầu</th><th>Học gần nhất</th><th>Mã bé</th></tr></thead><tbody>` +
     kids.map(k => `<tr><td><button class="kid" data-kid="${esc(k.id)}">${esc(k.name)}</button></td>

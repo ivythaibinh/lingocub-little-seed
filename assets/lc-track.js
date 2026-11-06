@@ -26,6 +26,14 @@
   /* ---------- lưu trên máy ---------- */
   function get(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
   function set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  /* Hệ đăng nhập mới (đăng ký qua Google Form): xóa đăng nhập cũ còn lưu trên máy, một lần */
+  (function () {
+    try {
+      if (localStorage.getItem("lc-auth") === "2") return;
+      ["lc-user", "lc-kids", "lc-queue"].forEach(function (k) { localStorage.removeItem(k); });
+      localStorage.setItem("lc-auth", "2");
+    } catch (e) {}
+  })();
   function user() { return get("lc-user", null); }
   function doneKey(n) { var u = user(); return "lingocub-unit" + n + "-done" + (u ? ":" + u.id : ""); }
 
@@ -275,6 +283,9 @@
     ".lc-sep{font-size:13px;font-weight:800;color:#7A6553;text-transform:uppercase;letter-spacing:.06em}" +
     ".lc-x{justify-self:end;margin:-8px -6px -18px 0;font:inherit;font-weight:800;font-size:15px;border:2px solid #EAD7B8;background:#fff;border-radius:999px;padding:4px 12px;cursor:pointer;color:#7A6553}" +
     ".lc-out{font:inherit;font-weight:800;font-size:13px;border:0;background:none;color:#7A6553;text-decoration:underline;cursor:pointer}" +
+    ".lc-reg{margin:0;font-weight:800;font-size:15px;color:#3D2F24}.lc-reg a{color:#2a78d6;text-decoration:underline;text-underline-offset:3px}" +
+    ".lc-pw{position:relative}.lc-pw input{padding-right:84px}" +
+    ".lc-eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);font:inherit;font-weight:800;font-size:13px;border:2px solid #EAD7B8;background:#fff;color:#7A6553;border-radius:999px;padding:6px 10px;cursor:pointer;min-height:36px}" +
     ".lc-chip{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px 0 8px;border-radius:999px;background:#FFF6DA;border:2px solid #FFC94A;" +
     "font:inherit;font-weight:800;font-size:15px;color:#3A2A00;cursor:pointer;max-width:60vw}" +
     ".lc-chip b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lc-chip small{font-size:12px;opacity:.75;white-space:nowrap}" +
@@ -300,7 +311,7 @@
 
   function showLogin(canClose) {
     style();
-    var prev = user(), kids = get("lc-kids", []);
+    var prev = user(), kids = get("lc-kids", []), formUrl = get("lc-form", "");
     var ov = el("div", "lc-ov");
     ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true"); ov.setAttribute("aria-label", "Đăng nhập");
     var c = el("form", "lc-card");
@@ -310,36 +321,47 @@
       "<h2>Chào con! 你好！Hello!</h2>" +
       (kids.length ? '<span class="lc-sep">Bé nào đang học?</span><div class="lc-kids">' +
         kids.map(function (k, i) { return '<button type="button" class="lc-kid' + (prev && prev.id === k.id ? " on" : "") + '" data-i="' + i + '">' + esc(k.name) + "</button>"; }).join("") +
-        '</div><span class="lc-sep">Hoặc bé khác</span>' : "<p>Bố mẹ nhập giúp con lần đầu nhé. Máy sẽ nhớ cho lần sau.</p>") +
-      '<label>Tên của bé<input name="n" autocomplete="off" autocapitalize="words" maxlength="40" placeholder="Ví dụ: Minh An"></label>' +
-      '<label>Số điện thoại bố hoặc mẹ<input name="p" type="tel" inputmode="numeric" autocomplete="tel" maxlength="15" placeholder="09xx xxx xxx"></label>' +
+        '</div><span class="lc-sep">Hoặc đăng nhập bé khác</span>' : "<p>Bố mẹ đăng nhập giúp con nhé. Máy sẽ nhớ cho lần sau.</p>") +
+      '<label>Tên đăng nhập<input name="n" autocomplete="username" autocapitalize="words" maxlength="40" placeholder="Tên của bé, ví dụ: Minh An"></label>' +
+      '<label>Mật khẩu (số điện thoại bố hoặc mẹ)<span class="lc-pw"><input name="p" type="password" inputmode="numeric" autocomplete="current-password" maxlength="15" placeholder="09xx xxx xxx"><button type="button" class="lc-eye" data-eye>Hiện</button></span></label>' +
       '<div class="lc-err" aria-live="polite"></div>' +
       '<button class="lc-go" type="submit">Vào học ▶</button>' +
+      '<p class="lc-reg" data-reg' + (formUrl ? "" : " hidden") + '>Chưa có tài khoản? <a href="' + esc(formUrl) + '" target="_blank" rel="noopener">Đăng ký tại đây</a></p>' +
       (prev ? '<button type="button" class="lc-out" data-out>Đăng xuất bé ' + esc(prev.name) + "</button>" : "");
     ov.appendChild(c);
     document.body.appendChild(ov);
-    var err = c.querySelector(".lc-err"), btn = c.querySelector(".lc-go");
+    var err = c.querySelector(".lc-err"), btn = c.querySelector(".lc-go"), reg = c.querySelector("[data-reg]");
+    function showReg(u) {
+      if (!u) return;
+      set("lc-form", u); formUrl = u;
+      reg.querySelector("a").href = u; reg.hidden = false;
+    }
+    if (API) fetch(API + "?action=config").then(function (r) { return r.json(); }).then(function (j) { if (j && j.form) showReg(j.form); }).catch(function () {});
     function close() { ov.remove(); }
     c.addEventListener("click", function (e) {
       var k = e.target.closest("[data-i]");
       if (k) { saveKid(kids[+k.dataset.i]); close(); afterLogin(prev); return; }
       if (e.target.closest("[data-x]")) { close(); return; }
+      if (e.target.closest("[data-eye]")) {
+        var b = e.target.closest("[data-eye]"), show = c.p.type === "password";
+        c.p.type = show ? "text" : "password"; b.textContent = show ? "Ẩn" : "Hiện"; return;
+      }
       if (e.target.closest("[data-out]")) { try { localStorage.removeItem("lc-user"); } catch (x) {} location.reload(); }
     });
     c.addEventListener("submit", function (e) {
       e.preventDefault();
       var n = c.n.value.replace(/\s+/g, " ").trim(), p = phone(c.p.value);
-      if (!n) { err.textContent = "Bố mẹ nhập tên của bé nhé."; c.n.focus(); return; }
-      if (p.length < 9 || p.length > 11) { err.textContent = "Số điện thoại chưa đúng, bố mẹ kiểm tra lại nhé."; c.p.focus(); return; }
+      if (!n) { err.textContent = "Bố mẹ nhập tên đăng nhập của bé nhé."; c.n.focus(); return; }
+      if (p.length < 9 || p.length > 11) { err.textContent = "Mật khẩu là số điện thoại, bố mẹ kiểm tra lại nhé."; c.p.focus(); return; }
+      if (!API) { err.textContent = "Web chưa nối với Google Sheet nên chưa đăng nhập được."; return; }
       err.textContent = ""; btn.disabled = true; btn.textContent = "Đang vào…";
-      var local = { id: p + "-" + slug(n), name: n, phone: p, lop: "" };
-      post({ action: "login", name: n, phone: p }, 9000)
+      post({ action: "login", name: n, phone: p }, 12000)
         .then(function (j) {
           if (j && j.ok && j.student) return j.student;
-          if (j && j.error) throw { show: j.error };
-          return local;
+          if (j && j.form) showReg(j.form);
+          throw { show: (j && j.error) || "Chưa đăng nhập được, bố mẹ thử lại nhé." };
         })
-        .catch(function (x) { if (x && x.show) throw x; return local; })
+        .catch(function (x) { if (x && x.show) throw x; throw { show: "Chưa kết nối được mạng, bố mẹ kiểm tra rồi thử lại nhé." }; })
         .then(function (u) { saveKid(u); close(); afterLogin(prev); })
         .catch(function (x) { err.textContent = x.show; btn.disabled = false; btn.textContent = "Vào học ▶"; });
     });
