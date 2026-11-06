@@ -8,6 +8,7 @@
 <link rel="icon" href="../assets/pixel/sun.png">
 <link rel="stylesheet" href="../assets/pixel/pixel.css">
 <script src="../assets/lc-track.js" data-chip="off"></script>
+<script src="../assets/lc-music.js" data-side="right" data-bottom="190"></script>
 <script src="../assets/lc-path.js"></script>
 <script src="../nong-trai/img/atlas.js"></script>
 <script src="units.js"></script>
@@ -452,10 +453,12 @@ function route(){
     $("newtab").href = full(it.url);
     if(!before) before = snapshot();
     viewer.hidden = false; document.body.style.overflow = "hidden";
+    if(window.LCMUSIC) LCMUSIC.hold(true);
     try{ const dk = LC.doneKey(n), d = JSON.parse(localStorage.getItem(dk)) || {}; if(!d[k]){ d[k] = true; localStorage.setItem(dk, JSON.stringify(d)); } }catch(e){}
   }else{
     if(m) history.replaceState(null, "", location.pathname + location.search);
     viewer.hidden = true; document.body.style.overflow = "";
+    if(window.LCMUSIC) LCMUSIC.hold(false);
     if(frame.dataset.k){ frame.contentWindow.location.replace("about:blank"); frame.dataset.k = ""; }
     if(before){ const b = before; before = null; paint(); celebrate(b); }
   }

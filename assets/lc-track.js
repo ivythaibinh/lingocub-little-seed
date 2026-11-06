@@ -13,6 +13,8 @@
   var MODE = (me && me.getAttribute("data-mode")) || "kid";
   var NOCHIP = !!(me && me.getAttribute("data-chip") === "off");
 
+  try { var sx = document.createElement("script"); sx.src = ROOT + "assets/lc-sfx.js"; (document.head || document.documentElement).appendChild(sx); } catch (e) {}
+
   var href = location.href.split(/[?#]/)[0];
   var rel = href.indexOf(ROOT) === 0 ? href.slice(ROOT.length) : location.pathname.replace(/^\//, "");
   var m = rel.match(/^unit-(\d+)\/(?:([a-z0-9-]+)\/)?/);
